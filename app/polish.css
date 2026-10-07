@@ -241,3 +241,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .destination-wrap{position:relative}
 .swap-locations{position:absolute;left:50%;bottom:-19px;transform:translateX(-50%);z-index:4;width:30px;height:30px;border:1px solid var(--line);border-radius:999px;background:var(--paper);display:grid;place-items:center;box-shadow:0 8px 24px rgba(11,13,12,.1)}
 @media(max-width:620px){.smart-route{align-items:flex-start}.swap-locations{bottom:auto;top:50%;margin-top:11px}}
+
+.login-eyes{position:absolute;right:-22px;top:-92px;transform:scale(.36);transform-origin:bottom right;pointer-events:none;opacity:.94}
+.auth-card{position:relative}
+@media(max-width:620px){.login-eyes{right:-8px;top:-70px;transform:scale(.28)}}
