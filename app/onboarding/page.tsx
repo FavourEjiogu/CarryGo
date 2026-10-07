@@ -51,6 +51,16 @@ export default function Onboarding() {
   },[campuses,campusQuery]);
   const selectedCampus=campuses.find(c=>c.id===campusId);
 
+  useEffect(()=>{
+    if(!campusId)return;
+    let live=true;
+    fetch('/api/academic?campus_id='+encodeURIComponent(campusId),{cache:'no-store'})
+      .then(async r=>r.ok?r.json():{faculties:[],departments:[]})
+      .then(a=>{if(live){setFaculties(a.faculties||[]);setDepartments(a.departments||[])}})
+      .catch(()=>{});
+    return()=>{live=false};
+  },[campusId]);
+
   async function finish(e:FormEvent) {
     e.preventDefault();setError('');
     if(step===1){
