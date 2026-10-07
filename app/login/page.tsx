@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'motion/react';
 import { Icon } from '@/src/components/icons';
 import { MotionPage } from '@/src/components/MotionPage';
+import { MouseFollowingEyes } from '@/components/ui/mouse-following-eyes';
 import { track } from '@/src/lib/analytics';
 import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 
@@ -126,6 +127,7 @@ export default function Login() {
       <MotionPage className="auth-card-wrap">
         <header className="auth-mobile-top"><Link className="brand" href="/"><i className="brand-dot"/>CarryGo</Link></header>
         <div className="auth-card card">
+          <MouseFollowingEyes className="login-eyes" />
           <div className="auth-switch" role="tablist" aria-label="Account access">
             <button role="tab" aria-selected={mode==='signin'} className={mode==='signin'?'active':''} type="button" onClick={()=>{setMode('signin');setError('');setSent(false);setCode('')}}>Sign in</button>
             <button role="tab" aria-selected={mode==='signup'} className={mode==='signup'?'active':''} type="button" onClick={()=>{setMode('signup');setError('');setSent(false);setCode('')}}>Create account</button>
