@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'motion/react';
 import { Icon } from '@/src/components/icons';
 import { MotionPage } from '@/src/components/MotionPage';
+import { track } from '@/src/lib/analytics';
 import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 
 type Mode = 'signin' | 'signup';
@@ -54,6 +55,7 @@ export default function Login() {
       if(authError){setError(authError.message);return;}
       localStorage.setItem('cg:remember-me',remember?'1':'0');
       if(mode==='signup')localStorage.setItem('cg:pending-signup',JSON.stringify({name:name.trim(),email:email.trim().toLowerCase()}));
+      track('auth_link_requested',{mode,keep_signed_in:remember});
       setSent(true);setSeconds(30);
     }catch(e){setError(e instanceof Error?e.message:'Could not send your sign-in link.');}
     finally{setBusy(false)}
