@@ -42,8 +42,8 @@ export default function DoPage(){
        const queries=[parsed.pickup,parsed.destination].filter(Boolean) as string[];
        const matches=await Promise.all(queries.map(resolve));
        let index=0;
-       if(parsed.pickup&&!touched.current.pickup){const match=matches[index++];if(match){setPickup(match.name);setPickupId(match.id);setPickupKind(match.kind||'');setPickupMerchant(match.merchant||undefined)}else setPickup(parsed.pickup)}
-       if(parsed.destination&&!touched.current.destination){const match=matches[index++];if(match){setDestination(match.name);setDestinationId(match.id);setDestinationKind(match.kind||'')}else setDestination(parsed.destination)}
+       if(parsed.pickup&&!touched.current.pickup){const match=matches[index++];if(match){setPickup(match.label);setPickupId(match.locationId);setPickupKind(match.kind||'');setPickupMerchant(match.merchant||undefined)}else setPickup(parsed.pickup)}
+       if(parsed.destination&&!touched.current.destination){const match=matches[index++];if(match){setDestination(match.label);setDestinationId(match.locationId);setDestinationKind(match.kind||'')}else setDestination(parsed.destination)}
      }
      const routeKey=[parsed.pickup,parsed.destination,parsed.confidence].join('|');
      if(parsed.pickup&&parsed.destination&&routeKey!==lastTracked.current){lastTracked.current=routeKey;track('task route detected',{confidence:parsed.confidence})}
@@ -77,7 +77,7 @@ export default function DoPage(){
    title:title||'Task request',description,pickup_location_text:pickup,destination_location_text:destination,
    estimated_item_cost_kobo:Math.max(0,Math.round(Number(itemCost||0)*100)),
    proposed_runner_fee_kobo:Math.max(0,Math.round(Number(fee||0)*100)),
-   proposed_eta_minutes:Number(eta||30),delivery_mode:mode,delivery_room:room,scheduled_for:when||null,
+   proposed_eta_minutes:Number(eta||30),delivery_mode:mode,delivery_room:room,scheduled_for:when?new Date(when).toISOString():null,
    item_name:itemName||undefined,quantity:Number(quantity||1),pickup_location_id:pickupId,destination_location_id:destinationId,
    category:understanding?.category||'OTHER'
   })});
