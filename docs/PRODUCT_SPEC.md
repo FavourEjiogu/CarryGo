@@ -11,9 +11,9 @@ Operational behavior supplied by the founder/user is authoritative for CarryGo's
 Launch campus: Bingham University, Karu.
 
 Operating hours:
-- 05:00–22:00: marketplace active.
-- After 22:00: CarryGo sleeps.
-- A delivery already in progress may finish inside a hostel-only completion flow; no new ordinary marketplace jobs begin after 22:00.
+- 05:00–22:00: full marketplace active.
+- 22:00–05:00: new jobs are restricted to hostel or room delivery.
+- Deliveries already in progress may continue through completion; meet-up/landmark jobs cannot be newly created during the overnight window.
 
 Known residential locations:
 - Old Boys: Abel, Abraham, Daniel, Enoch, Moses, Noah, Samson, Barak, Emmanuel, Gideon.
