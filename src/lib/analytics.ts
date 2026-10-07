@@ -3,7 +3,7 @@
 import posthog from 'posthog-js';
 
 type AnalyticsEvent =
-  | 'auth link requested'
+  | 'auth verification requested'
   | 'onboarding step completed'
   | 'onboarding completed';
 
