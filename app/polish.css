@@ -157,3 +157,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .campus-options{max-height:230px}
   .campus-option{min-height:56px}
 }
+
+.home-orbit-card{position:relative}.orbit-pulse{position:absolute;left:50%;top:50%;width:96px;height:96px;margin:-48px;border:1px solid rgba(185,255,53,.35);border-radius:50%;pointer-events:none}.home-modern .float-card{backdrop-filter:blur(8px)}
