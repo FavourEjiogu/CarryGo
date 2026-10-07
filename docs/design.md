@@ -77,7 +77,7 @@ The home screen is an app dashboard, not a marketing landing page.
 
 Unauthenticated: explain the product quickly, show **I need something** and **I want to earn**, show the three-step mental model and demonstrate personality through restrained motion/state cards.
 
-Authenticated: greet the user, surface current tasks, show streak/earned discount, show the local live market, and keep low-data capability visible but secondary.
+Authenticated: greet the user, surface current tasks, show streak/earned discount, and show useful local context without exposing implementation details.
 
 Do not hard-code a campus name in the global home.
 
@@ -91,8 +91,8 @@ Prices use Nigerian naira formatting. Always distinguish item capital, runner fe
 
 Never let the client be the source of truth for balances or settlement.
 
-## Low-network UX
-Keep core screens light. Avoid map tiles for core execution. Prefer typed locations and campus suggestions. Cache the shell, queue safe writes such as location samples, show honest retry/offline states, and never cache private financial/API responses in a public service-worker cache.
+## Low-network UX (internal)
+Keep core screens light. Avoid map tiles for core execution. Prefer typed locations and campus suggestions. Cache the shell, queue safe writes such as location samples, show honest retry/offline states, and never cache private financial/API responses in a public service-worker cache. These are engineering constraints, not marketing claims; do not surface them as product features on the home screen.
 
 ## Accessibility
 Minimum bar: semantic headings and landmarks; visible focus states; keyboard navigation; labelled inputs; role=alert for recoverable errors; dialog focus management; roughly 44px touch targets; reduced-motion support; colour never being the only state indicator; readable errors adjacent to the affected control.
