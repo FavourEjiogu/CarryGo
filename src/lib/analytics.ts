@@ -3,9 +3,9 @@
 import posthog from 'posthog-js';
 
 type AnalyticsEvent =
-  | 'auth_link_requested'
-  | 'onboarding_step_completed'
-  | 'onboarding_completed';
+  | 'auth link requested'
+  | 'onboarding step completed'
+  | 'onboarding completed';
 
 type AnalyticsProperties = Record<string, string | number | boolean | null>;
 
