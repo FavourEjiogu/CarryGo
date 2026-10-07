@@ -1,0 +1,1 @@
+import{NextResponse}from'next/server';export async function POST(){return NextResponse.json({error:'WALLET_REQUIRED',message:'CarryGo task funding is wallet-backed. Top up your wallet first.'},{status:410})}
