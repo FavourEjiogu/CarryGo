@@ -116,3 +116,33 @@ CarryGo may take interaction inspiration from 21st.dev, Aceternity UI, Magic UI 
 - No UI feature without a user job it improves.
 - No large dependency for a small effect.
 - No decorative map dependency in the critical path.
+
+## Implementation delta · October 2026
+
+The global home and footer are campus-neutral. The onboarding flow asks for the user's school or campus after authentication, using live campus data with search and a clear selected state. Academic details remain optional.
+
+Task location suggestions are now fetched for the signed-in user's selected campus from the campus_locations directory. The client still allows free-text locations when a place is not in the directory.
+
+The dashboard derives all market counts and task context from the authenticated user's campus_id. No application-level global campus identifier is used for marketplace data.
+
+Authentication callbacks resolve through NEXT_PUBLIC_SITE_URL, reject non-HTTPS canonical origins in production, and require a campus as part of onboarding completion. Keep me signed in remains explicit and is stored in the existing session-cookie strategy.
+
+Security response headers are applied at the framework boundary. The service worker continues to avoid caching API responses. The campus_locations RLS policy now enforces same-campus reads instead of the previous tautological campus comparison.
+
+The visual implementation intentionally keeps the existing CarryGo grammar: paper/ink canvas, black primary actions, electric green state signals, purple emphasis, bold grotesk type, rounded cards, restrained Motion, and thumb-friendly mobile controls.
+
+Reference libraries such as 21st.dev, Aceternity UI, Magic UI and Motion are treated as interaction references rather than a component dependency list. Every borrowed pattern must improve a real user job.
+
+## Release gate
+
+A release is not considered complete merely because the UI looks finished. The evidence gate is:
+
+- production build passes;
+- automated tests pass;
+- TypeScript and lint checks pass;
+- Supabase security and performance advisories are reviewed;
+- protected financial mutations are server/database authoritative;
+- RLS policies are reviewed for cross-user and cross-campus access;
+- auth redirect configuration is verified in the Supabase dashboard;
+- production runtime errors are reviewed after deployment;
+- any unverified external setting is recorded as a launch blocker rather than assumed away.
