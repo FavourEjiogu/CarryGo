@@ -73,8 +73,8 @@ export default function Login() {
         <header className="auth-mobile-top"><Link className="brand" href="/"><i className="brand-dot"/>CarryGo</Link></header>
         <div className="auth-card card">
           <div className="auth-switch" role="tablist" aria-label="Account access">
-            <button className={mode==='signin'?'active':''} type="button" onClick={()=>{setMode('signin');setError('');setSent(false)}}>Sign in</button>
-            <button className={mode==='signup'?'active':''} type="button" onClick={()=>{setMode('signup');setError('');setSent(false)}}>Create account</button>
+            <button role="tab" aria-selected={mode==='signin'} className={mode==='signin'?'active':''} type="button" onClick={()=>{setMode('signin');setError('');setSent(false)}}>Sign in</button>
+            <button role="tab" aria-selected={mode==='signup'} className={mode==='signup'?'active':''} type="button" onClick={()=>{setMode('signup');setError('');setSent(false)}}>Create account</button>
           </div>
           <AnimatePresence mode="wait">
             {sent ? <motion.div key="sent" className="auth-sent" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}}>
@@ -92,8 +92,8 @@ export default function Login() {
               <form onSubmit={submit} className="auth-form">
                 {mode==='signup'&&<label>Name<input autoFocus value={name} onChange={e=>setName(e.target.value)} placeholder="Your name" autoComplete="name" /></label>}
                 <label>Email<input autoFocus={mode==='signin'} required type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" inputMode="email" /></label>
-                <label className="remember"><input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)}/><span><b>Keep me signed in</b><small>Uses a persistent session on this device.</small></span></label>
-                {error&&<div className="auth-error"><Icon name="shield" size={15}/>{error}</div>}
+                <label className="remember"><input id="remember-me" type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)} aria-describedby="remember-help"/><span><b>Keep me signed in</b><small id="remember-help">Keeps this device signed in for up to 400 days.</small></span></label>
+                {error&&<div className="auth-error" role="alert"><Icon name="shield" size={15}/>{error}</div>}
                 <button className="btn dark full auth-submit" disabled={busy}>{busy?'Sending secure link…':mode==='signup'?'Create my account':'Send sign-in link'}<Icon name="arrow" size={17}/></button>
               </form>
               <div className="auth-trust"><span><Icon name="shield" size={14}/>Passwordless</span><span><Icon name="clock" size={14}/>Takes about a minute</span><span><Icon name="map" size={14}/>Bingham only</span></div>
