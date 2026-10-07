@@ -10,21 +10,26 @@ export default function NotificationsPage(){
   const [items,setItems]=useState<any[]>([]);
   const [busy,setBusy]=useState(true);
   const [error,setError]=useState('');
-  async function load(){
-    setBusy(true);
-    try{
-      const r=await fetch('/api/notifications');
-      const j=await r.json();
-      if(!r.ok) throw new Error(j.error||'Sign in required');
-      setItems(j.notifications||[]);
-    }catch(e){setError(e instanceof Error?e.message:'Could not load inbox.');}
-    finally{setBusy(false);}
-  }
-  useEffect(()=>{load();},[]);
+
+  useEffect(()=>{
+    let cancelled=false;
+    queueMicrotask(async()=>{
+      try{
+        const r=await fetch('/api/notifications');
+        const j=await r.json();
+        if(!r.ok)throw new Error(j.error||'Sign in required');
+        if(!cancelled)setItems(j.notifications||[]);
+      }catch(e){if(!cancelled)setError(e instanceof Error?e.message:'Could not load inbox.');}
+      finally{if(!cancelled)setBusy(false);}
+    });
+    return()=>{cancelled=true};
+  },[]);
+
   async function mark(id?:string){
     await fetch('/api/notifications',{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify(id?{id}:{all:true})});
     setItems(x=>id?x.map(n=>n.id===id?{...n,read_at:new Date().toISOString()}:n):x.map(n=>({...n,read_at:n.read_at||new Date().toISOString()})));
   }
+
   if(error)return <AppShell><main className="shell app-page narrow"><div className="card success"><h2>{error}</h2><Link className="btn dark" href="/login">Sign in</Link></div></main></AppShell>;
   return <AppShell><MotionPage className="shell app-page narrow">
     <div className="page-top"><div><div className="eyebrow">INBOX</div><h1 className="app-title">Keep moving.</h1><p className="sub">Offers, task updates, wallet events and useful CarryGo nudges.</p></div>{items.some(x=>!x.read_at)&&<button className="btn ghost" onClick={()=>mark()}>Mark all read</button>}</div>
