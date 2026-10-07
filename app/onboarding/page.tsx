@@ -78,7 +78,7 @@ export default function Onboarding() {
     <div className="auth-orbit" aria-hidden="true"/>
     <MotionPage className="auth-frame onboarding-frame">
       <header className="auth-top"><span className="brand"><i className="brand-dot"/>CarryGo</span><span className="auth-step">STEP {step} OF 2</span></header>
-      <div className="onboarding-progress"><motion.i animate={{width:step===1?'50%':'100%'}}/></div>
+      <div className="onboarding-progress" role="progressbar" aria-label="Onboarding progress" aria-valuemin={1} aria-valuemax={2} aria-valuenow={step}><motion.i animate={{width:step===1?'50%':'100%'}}/></div>
       <div className="onboarding-intro">
         <div className="pill"><Icon name="shield" size={14}/> Built around your campus account</div>
         <h1>{step===1?<>Let’s make CarryGo <em>yours.</em></>:<>Make it easier to <em>serve you.</em></>}</h1>
@@ -99,7 +99,7 @@ export default function Onboarding() {
             <label>Department <span className="muted-inline">optional</span><select value={departmentId} onChange={e=>setDepartmentId(e.target.value)}><option value="">Choose later</option>{visibleDepartments.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></label>
             <label>Gender <span className="muted-inline">optional</span><select value={gender} onChange={e=>setGender(e.target.value)}><option value="UNSPECIFIED">Prefer not to say</option><option value="MALE">Male</option><option value="FEMALE">Female</option></select></label>
             <div className="auth-assurance"><Icon name="shield" size={16}/><span>Gender is not shown publicly. It only matters for same-gender room requests.</span></div>
-            {error&&<div className="error">{error}</div>}
+            {error&&<div className="error" role="alert">{error}</div>}
             <button className="btn dark full" type="submit" disabled={busy}>{busy?'Finishing…': 'Enter CarryGo'}</button>
             <button className="btn ghost full" type="button" onClick={()=>setStep(1)} disabled={busy}>Back</button>
           </motion.div>}
