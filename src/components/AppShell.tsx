@@ -20,5 +20,6 @@ export function AppShell({children}:{children:React.ReactNode}){
     </div></header>
     <main><motion.div className="route-stage" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:.25,ease:[.22,1,.36,1]}}>{children}</motion.div></main>
     <nav className="mobile-nav" aria-label="Primary navigation">{nav.map(([href,label,icon])=><Link key={href} href={href} className={active(href)?'active':''}>{active(href)&&<motion.i layoutId="nav-active" className="nav-active"/>}<Icon name={icon} size={18}/><span>{label}</span></Link>)}</nav>
+    <footer className="app-footer shell"><span>CarryGo · Bingham University, Karu</span><span><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></span></footer>
   </div>
 }
