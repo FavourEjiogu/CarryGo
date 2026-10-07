@@ -102,7 +102,7 @@ export default function Onboarding() {
               </div>}
               {campusOpen&&visibleCampuses.length===0&&<div className="campus-empty" role="status">No matching campus yet. Try the full school name.</div>}
             </div>
-            <div className="auth-assurance"><Icon name="map" size={16}/><span>Your campus controls local places and marketplace context. Bingham is one campus, not the product.</span></div>
+            <div className="auth-assurance"><Icon name="map" size={16}/><span>Your campus controls local places and marketplace context. We keep your school choice tied to your account.</span></div>
             <label>Faculty <span className="muted-inline">optional</span><select value={facultyId} onChange={e=>{setFacultyId(e.target.value);setDepartmentId('')}}><option value="">Choose later</option>{faculties.map(f=><option key={f.id} value={f.id}>{f.name}</option>)}</select></label>
             <label>Department <span className="muted-inline">optional</span><select value={departmentId} onChange={e=>setDepartmentId(e.target.value)}><option value="">Choose later</option>{visibleDepartments.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></label>
             <label>Gender <span className="muted-inline">optional</span><select value={gender} onChange={e=>setGender(e.target.value)}><option value="UNSPECIFIED">Prefer not to say</option><option value="MALE">Male</option><option value="FEMALE">Female</option></select></label>
