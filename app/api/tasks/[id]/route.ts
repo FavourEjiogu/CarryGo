@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/src/lib/supabase/server';
+import { createSupabaseAdminClient } from '@/src/lib/supabase/admin';
 
 export async function GET(_request:Request,{params}:{params:Promise<{id:string}>}){
   const {id}=await params;
@@ -29,5 +30,11 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
     const map=new Map((profiles||[]).map(x=>[x.user_id,x]));
     bidRows=bidRows.map(b=>({...b,runner:map.get(b.runner_id)||null}));
   }
-  return NextResponse.json({task,agreement:agreement.data||null,runner:runner.data||null,bids:bidRows,messages:messages.data||[],adjustments:adjustments.data||[],tracking:{session:location.data||null},handoff:handoff.data?.handoff||null,viewer_id:user.id},{headers:{'cache-control':'private, no-store'}});
+  const admin=createSupabaseAdminClient();
+  const adjustmentRows=await Promise.all((adjustments.data||[]).map(async row=>{
+    if(!row.evidence_object_path)return row;
+    const signed=await admin.storage.from('task-evidence').createSignedUrl(row.evidence_object_path,300);
+    return {...row,evidence_url:signed.data?.signedUrl||null};
+  }));
+  return NextResponse.json({task,agreement:agreement.data||null,runner:runner.data||null,bids:bidRows,messages:messages.data||[],adjustments:adjustmentRows,tracking:{session:location.data||null},handoff:handoff.data?.handoff||null,viewer_id:user.id},{headers:{'cache-control':'private, no-store'}});
 }
