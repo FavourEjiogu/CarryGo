@@ -23,27 +23,29 @@ export default function Onboarding() {
   const [error,setError]=useState('');
 
   useEffect(()=>{
-    const pending=localStorage.getItem('cg:pending-signup');
-    if(pending){
-      try {
-        const p=JSON.parse(pending);
-        if(typeof p.name==='string') setName(p.name);
-      } catch {}
-    }
-    Promise.all([
-      fetch('/api/me').then(r=>r.ok?r.json():Promise.reject(new Error('Sign in required'))),
-      fetch('/api/academic').then(r=>r.json()),
-    ]).then(([m,a])=>{
-      if(!m?.profile) throw new Error('Could not load your account.');
-      setProfile(m.profile);
-      setName(v=>v||m.profile.display_name||'');
-      setPhone(m.profile.phone_number||'');
-      setFacultyId(m.profile.faculty_id||'');
-      setDepartmentId(m.profile.department_id||'');
-      setGender(m.profile.gender||'UNSPECIFIED');
-      setFaculties(a.faculties||[]);
-      setDepartments(a.departments||[]);
-    }).catch(e=>setError(e instanceof Error?e.message:'Sign in required'));
+    queueMicrotask(async()=>{
+      const pending=localStorage.getItem('cg:pending-signup');
+      if(pending){
+        try{
+          const p=JSON.parse(pending);
+          if(typeof p.name==='string')setName(p.name);
+        }catch{}
+      }
+      try{
+        const [meResponse,academicResponse]=await Promise.all([fetch('/api/me'),fetch('/api/academic')]);
+        const m=await meResponse.json();
+        const a=await academicResponse.json();
+        if(!meResponse.ok||!m?.profile)throw new Error(m.error||'Sign in required');
+        setProfile(m.profile);
+        setName(v=>v||m.profile.display_name||'');
+        setPhone(m.profile.phone_number||'');
+        setFacultyId(m.profile.faculty_id||'');
+        setDepartmentId(m.profile.department_id||'');
+        setGender(m.profile.gender||'UNSPECIFIED');
+        setFaculties(a.faculties||[]);
+        setDepartments(a.departments||[]);
+      }catch(e){setError(e instanceof Error?e.message:'Could not load your account.');}
+    });
   },[]);
 
   const visibleDepartments=useMemo(()=>departments.filter(d=>!facultyId||d.faculty_id===facultyId),[departments,facultyId]);
@@ -63,14 +65,14 @@ export default function Onboarding() {
         display_name:name.trim(),phone_number:phone.replace(/\s+/g,''),gender,faculty_id:facultyId||null,department_id:departmentId||null
       })});
       const j=await r.json();
-      if(!r.ok) throw new Error(j.error||'Could not finish your profile.');
+      if(!r.ok)throw new Error(j.error||'Could not finish your profile.');
       localStorage.removeItem('cg:pending-signup');
       router.replace('/');
     }catch(e){setError(e instanceof Error?e.message:'Could not finish your profile.');}
     finally{setBusy(false);}
   }
 
-  if(!profile&&!error) return <main className="auth-page"><div className="auth-loading"><span className="brand"><i className="brand-dot"/>CarryGo</span><div className="loader-line"/></div></main>;
+  if(!profile&&!error)return <main className="auth-page"><div className="auth-loading"><span className="brand"><i className="brand-dot"/>CarryGo</span><div className="loader-line"/></div></main>;
 
   return <main className="auth-page onboarding-page">
     <div className="auth-orbit" aria-hidden="true"/>
@@ -80,7 +82,7 @@ export default function Onboarding() {
       <div className="onboarding-intro">
         <div className="pill"><Icon name="shield" size={14}/> Built around your campus account</div>
         <h1>{step===1?<>Let’s make CarryGo <em>yours.</em></>:<>Make it easier to <em>serve you.</em></>}</h1>
-        <p>{step===1?'Your name and mobile number help runners know who to hand over to.': 'These details stay minimal. Gender is only checked when you request same-gender room delivery.'}</p>
+        <p>{step===1?'Your name and mobile number help runners know who to hand over to.':'These details stay minimal. Gender is only checked when you request same-gender room delivery.'}</p>
       </div>
 
       <form className="onboarding-form" onSubmit={finish}>
