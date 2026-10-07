@@ -67,7 +67,7 @@ export default function Onboarding() {
     if(step===1){
       if(name.trim().length<2){setError('Tell us your name first.');return}
       if(!/^(?:\+234|0)[789]\d{9}$/.test(phone.replace(/\s+/g,''))){setError('Enter a valid Nigerian mobile number.');return}
-      track('onboarding_step_completed',{step:1});
+      track('onboarding step completed',{step:1});
       setStep(2);return;
     }
     if(!campusId){setError('Choose your school or campus first.');return}
@@ -77,7 +77,7 @@ export default function Onboarding() {
         display_name:name.trim(),phone_number:phone.replace(/\s+/g,''),gender,campus_id:campusId,faculty_id:facultyId||null,department_id:departmentId||null
       })});
       const j=await r.json();if(!r.ok)throw new Error(j.error||'Could not finish your profile.');
-      track('onboarding_completed',{
+      track('onboarding completed',{
         academic_details_provided:Boolean(facultyId||departmentId),
         gender_provided:gender!=='UNSPECIFIED',
       });
