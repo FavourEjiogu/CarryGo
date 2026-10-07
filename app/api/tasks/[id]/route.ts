@@ -5,7 +5,7 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
   const {id}=await params;
   const s=await createSupabaseServerClient();
   const {data:{user}}=await s.auth.getUser();
-  if(!user)return NextResponse.json({error:'Sign in required'},{status:401},{headers:{'cache-control':'no-store'}});
+  if(!user)return NextResponse.json({error:'Sign in required'},{status:401,headers:{'cache-control':'no-store'}});
   const {data:task,error}=await s.from('errands').select('id,campus_id,payer_id,runner_id,title,description,category,estimated_item_cost_kobo,proposed_runner_fee_kobo,proposed_eta_minutes,hard_max_total_kobo,status,runner_preference,delivery_mode,delivery_room,scheduled_for,same_gender_premium_kobo,service_fee_kobo,service_fee_discount_kobo,discount_percent_used,pickup_location_text,destination_location_text,started_at,vendor_arrived_at,handoff_started_at,completed_at,created_at,updated_at').eq('id',id).maybeSingle();
   if(error)return NextResponse.json({error:'Could not load task.'},{status:400});
   if(!task)return NextResponse.json({error:'Task not found.'},{status:404});
