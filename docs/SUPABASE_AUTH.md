@@ -51,7 +51,7 @@ The CarryGo UI selector does not change the Supabase API method; it controls wha
 - Magic link → open `{{ .ConfirmationURL }}`.
 - OTP → enter `{{ .Token }}` and call `verifyOtp({ email, token, type: 'email' })`.
 
-Supabase's passwordless documentation confirms that Magic Links and email OTPs share the same `signInWithOtp` implementation and that the email template controls the content sent to the user. citeturn542799search0
+Supabase's passwordless documentation confirms that Magic Links and email OTPs share the same `signInWithOtp` implementation and that the email template controls the content sent to the user.
 
 ## Security notes
 
