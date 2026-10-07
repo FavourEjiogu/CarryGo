@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from "react";
 interface EyeProps {
   mouseX: number;
   mouseY: number;
-  selfRef: React.RefObject<HTMLDivElement>;
-  otherRef: React.RefObject<HTMLDivElement>;
+  selfRef: React.RefObject<HTMLDivElement | null>;
+  otherRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const Eye: React.FC<EyeProps> = ({ mouseX, mouseY, selfRef, otherRef }) => {
