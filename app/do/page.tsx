@@ -20,7 +20,7 @@ export default function DoPage(){
  const changePickup=(value:string)=>{routeTouched.current.pickup=true;setPickup(value);setPickupKind('')};
  const changeDestination=(value:string)=>{routeTouched.current.destination=true;setDestination(value);setDestinationKind('')};
  const applyDetected=()=>{if(!detectedRoute)return;routeTouched.current={pickup:false,destination:false};setPickup(detectedRoute.pickup);setDestination(detectedRoute.destination);setPickupKind('');setDestinationKind('')};
- const swapLocations=()=>{routeTouched.current={pickup:true,destination:true};setPickup(v=>{const next=destination;setDestination(v);return next});setPickupKind(destinationKind);setDestinationKind(pickupKind)};
+ const swapLocations=()=>{routeTouched.current={pickup:true,destination:true};const p=pickup,d=destination,pk=pickupKind,dk=destinationKind;setPickup(d);setDestination(p);setPickupKind(dk);setDestinationKind(pk)};
  async function submit(){
   setBusy(true);setError('');
   const r=await fetch('/api/tasks',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({title:title||'Task request',description,pickup_location_text:pickup,destination_location_text:destination,estimated_item_cost_kobo:Math.max(0,Math.round(Number(item||0)*100)),proposed_runner_fee_kobo:Math.max(0,Math.round(Number(fee||0)*100)),proposed_eta_minutes:Number(eta||30),delivery_mode:mode,delivery_room:room,scheduled_for:when||null})});
