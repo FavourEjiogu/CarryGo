@@ -55,7 +55,12 @@ At minimum:
 - handoff started;
 - completion confirmed.
 
-This gives the team actual answers to “how long does CarryGo take?” rather than relying on anecdotes.
+The product analytics layer currently starts with the highest-value account funnel:
+- auth_link_requested;
+- onboarding_step_completed;
+- onboarding_completed.
+
+These events contain no email address, name, phone number, campus identifier, wallet balance, task identifier or location. The browser SDK is configured with automatic click capture and session recording disabled, in-memory persistence, and respect for browser Do Not Track.
 
 ## Privacy
 
