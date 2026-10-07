@@ -12,14 +12,14 @@ export default function DoPage(){
  const[detectedRoute,setDetectedRoute]=useState<ParsedTaskRoute|null>(null);const routeTouched=useRef({pickup:false,destination:false});
 
  useEffect(()=>{const f=()=>setLate(nightWindow());f();const t=window.setInterval(f,60000);return()=>window.clearInterval(t)},[]);
- useEffect(()=>{const timer=window.setTimeout(()=>{const parsed=parseTaskRoute(description);setDetectedRoute(parsed);if(parsed){if(!routeTouched.current.pickup)setPickup(parsed.pickup);if(!routeTouched.current.destination)setDestination(parsed.destination)}},180);return()=>window.clearTimeout(timer)},[description]);
+ useEffect(()=>{const timer=window.setTimeout(()=>{const parsed=parseTaskRoute(description);setDetectedRoute(parsed);if(parsed){if(!routeTouched.current.pickup)setPickup(parsed.pickup);if(!routeTouched.current.destination)setDestination(parsed.destination);track('task route detected',{confidence:parsed.confidence}))}},180);return()=>window.clearTimeout(timer)},[description]);
 
  const chooseTemplate=(name:string,desc:string)=>{setTemplate(name);if(!title)setTitle(name==='Food'?'Pick up food':'Carry out a task');if(!description)setDescription(desc)};
  const pick=(label:string,kind:string)=>{routeTouched.current.pickup=true;setPickup(label);setPickupKind(kind);if(!title)setTitle(kind==='Food'||kind==='Market'?'Pick up from '+label:'Go to '+label)};
  const drop=(label:string,kind:string)=>{routeTouched.current.destination=true;setDestination(label);setDestinationKind(kind);if(kind==='Hostel')setMode('HOSTEL')};
  const changePickup=(value:string)=>{routeTouched.current.pickup=true;setPickup(value);setPickupKind('')};
  const changeDestination=(value:string)=>{routeTouched.current.destination=true;setDestination(value);setDestinationKind('')};
- const applyDetected=()=>{if(!detectedRoute)return;routeTouched.current={pickup:false,destination:false};setPickup(detectedRoute.pickup);setDestination(detectedRoute.destination);setPickupKind('');setDestinationKind('')};
+ const applyDetected=()=>{if(!detectedRoute)return;routeTouched.current={pickup:false,destination:false};setPickup(detectedRoute.pickup);setDestination(detectedRoute.destination);setPickupKind('');setDestinationKind('');track('task route applied',{confidence:detectedRoute.confidence})};
  const swapLocations=()=>{routeTouched.current={pickup:true,destination:true};const p=pickup,d=destination,pk=pickupKind,dk=destinationKind;setPickup(d);setDestination(p);setPickupKind(dk);setDestinationKind(pk)};
  async function submit(){
   setBusy(true);setError('');
