@@ -44,7 +44,8 @@ export default function Login() {
     try{
       if(mode==='signup'&&name.trim().length<2){setError('Add your name so your account starts personal.');return;}
       const supabase=getSupabaseBrowserClient(remember);
-      const redirect=window.location.origin+'/auth/callback?flow='+mode+'&remember='+(remember?'1':'0');
+      const site=(process.env.NEXT_PUBLIC_SITE_URL||window.location.origin).replace(/\/$/,'');
+      const redirect=site+'/auth/callback?flow='+mode+'&remember='+(remember?'1':'0');
       const {error:authError}=await supabase.auth.signInWithOtp({
         email:email.trim().toLowerCase(),
         options:{emailRedirectTo:redirect,shouldCreateUser:mode==='signup'},
@@ -64,9 +65,9 @@ export default function Login() {
     <div className="auth-layout">
       <aside className="auth-brand-panel">
         <Link className="brand auth-brand" href="/"><i className="brand-dot"/>CarryGo</Link>
-        <div className="auth-brand-copy"><span className="auth-kicker">BINGHAM · KARU</span><h2>Campus errands, <em>without the back-and-forth.</em></h2><p>Post it. Agree on the price and time. Fund it. Watch it move.</p></div>
+        <div className="auth-brand-copy"><span className="auth-kicker">CAMPUS EXECUTION</span><h2>Campus errands, <em>without the back-and-forth.</em></h2><p>Post it. Agree on the price and time. Fund it. Watch it move.</p></div>
         <div className="auth-feature-stack"><div><Icon name="bolt" size={17}/><span>Price + time negotiation</span></div><div><Icon name="location" size={17}/><span>Live delivery tracking</span></div><div><Icon name="shield" size={17}/><span>Wallet + handoff protection</span></div></div>
-        <span className="auth-footnote">Built for the way Bingham students actually move.</span>
+        <span className="auth-footnote">Built for the way students actually move.</span>
       </aside>
 
       <MotionPage className="auth-card-wrap">
@@ -96,7 +97,7 @@ export default function Login() {
                 {error&&<div className="auth-error" role="alert"><Icon name="shield" size={15}/>{error}</div>}
                 <button className="btn dark full auth-submit" disabled={busy}>{busy?'Sending secure link…':mode==='signup'?'Create my account':'Send sign-in link'}<Icon name="arrow" size={17}/></button>
               </form>
-              <div className="auth-trust"><span><Icon name="shield" size={14}/>Passwordless</span><span><Icon name="clock" size={14}/>Takes about a minute</span><span><Icon name="map" size={14}/>Bingham only</span></div>
+              <div className="auth-trust"><span><Icon name="shield" size={14}/>Passwordless</span><span><Icon name="clock" size={14}/>Takes about a minute</span><span><Icon name="map" size={14}/>Campus-first</span></div>
             </motion.div>}
           </AnimatePresence>
         </div>
