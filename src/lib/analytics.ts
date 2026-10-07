@@ -6,7 +6,9 @@ type AnalyticsEvent =
   | 'auth verification requested'
   | 'auth verification completed'
   | 'onboarding step completed'
-  | 'onboarding completed';
+  | 'onboarding completed'
+  | 'task route detected'
+  | 'task route applied';
 
 type AnalyticsProperties = Record<string, string | number | boolean | null>;
 
