@@ -30,8 +30,6 @@ const Eye: React.FC<EyeProps> = ({ mouseX, mouseY, selfRef, otherRef }) => {
   }, [updateCenter]);
 
   useEffect(() => {
-    updateCenter();
-
     const isInside = (ref: React.RefObject<HTMLDivElement>) => {
       const rect = ref.current?.getBoundingClientRect();
       if (!rect) return false;
@@ -53,7 +51,7 @@ const Eye: React.FC<EyeProps> = ({ mouseX, mouseY, selfRef, otherRef }) => {
     if (pupilRef.current) {
       pupilRef.current.style.transform = `translate(${Math.cos(angle) * maxMove}px, ${Math.sin(angle) * maxMove}px)`;
     }
-  }, [mouseX, mouseY, center, otherRef, selfRef, updateCenter]);
+  }, [mouseX, mouseY, center, otherRef, selfRef]);
 
   return (
     <div
