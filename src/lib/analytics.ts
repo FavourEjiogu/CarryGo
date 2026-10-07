@@ -8,7 +8,8 @@ type AnalyticsEvent =
   | 'onboarding step completed'
   | 'onboarding completed'
   | 'task route detected'
-  | 'task route applied';
+  | 'task route applied'
+  | 'route suggestion applied';
 
 type AnalyticsProperties = Record<string, string | number | boolean | null>;
 
