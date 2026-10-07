@@ -20,7 +20,7 @@ export default function DoPage(){
   if(!r.ok){setError(j.error||'Could not post this task.');return}
   router.push('/orders/'+j.task.id);
  }
- if(!ready)return <AppShell><main className="shell app-page narrow"><div className="card form"><h2>Sign in to use CarryGo.</h2><p className="sub">Your wallet, streaks and task history live on your account.</p><Link className="btn dark" href="/login">Sign in →</Link></div></AppShell>;
+ if(!ready)return <AppShell><main className="shell app-page narrow"><div className="card form"><h2>Sign in to use CarryGo.</h2><p className="sub">Your wallet, streaks and task history live on your account.</p><Link className="btn dark" href="/login">Sign in →</Link></div></main></AppShell>;
  return <AppShell><main className="shell app-page narrow">
   <div className="page-top"><div><div className="eyebrow">NEW TASK</div><h1 className="app-title">Tell us what needs doing.</h1><p className="sub">Type the places the way you normally say them. CarryGo handles the coordination.</p></div></div>
   {late&&<div className="late-banner"><strong>Hostel delivery only right now.</strong><span>From 10 PM to 5 AM, new jobs must end at a hostel or room. Full marketplace opens at 5 AM.</span></div>}
