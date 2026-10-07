@@ -1,0 +1,2 @@
+import{NextResponse}from'next/server';import{createSupabaseServerClient}from'@/src/lib/supabase/server';
+export async function GET(){const s=await createSupabaseServerClient();const{data,error}=await s.from('campuses').select('id,name,city,state,country_code').eq('is_active',true).order('name');if(error)return NextResponse.json({error:'Could not load campuses.'},{status:503});return NextResponse.json({campuses:data||[]},{headers:{'cache-control':'public, max-age=300, stale-while-revalidate=3600'}})}
