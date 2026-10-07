@@ -4,7 +4,7 @@ import './polish.css';
 
 export const metadata:Metadata={
   title:'CarryGo — Get it done',
-  description:'Campus-first execution marketplace for Bingham University, Karu.',
+  description:'Campus execution network for Nigeria.',
   manifest:'/manifest.webmanifest',
   icons:{icon:'/icon.svg'},
 };
