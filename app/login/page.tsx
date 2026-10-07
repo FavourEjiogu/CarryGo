@@ -101,7 +101,7 @@ export default function Login() {
         type:'email',
       });
       if(verifyError){setError(verifyError.message);return;}
-      track('auth verification requested',{mode,method:'otp_verified',keep_signed_in:remember});
+      track('auth verification completed',{mode,method:'otp',keep_signed_in:remember});
       await finishAuthentication();
     }catch(e){setError(e instanceof Error?e.message:'That code could not be verified.');}
     finally{setBusy(false)}
