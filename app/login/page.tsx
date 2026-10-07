@@ -25,12 +25,14 @@ export default function Login() {
   const [error,setError]=useState('');
 
   useEffect(()=>{
-    try{setRemember(localStorage.getItem('cg:remember-me')!=='0')}catch{}
-    const params=new URLSearchParams(window.location.search);
-    const incoming=params.get('mode');
-    if(incoming==='signup'||incoming==='signin')setMode(incoming);
-    const e=params.get('error');
-    if(e)setError(ERROR_COPY[e]||'Something went wrong. Try again.');
+    queueMicrotask(()=>{
+      try{setRemember(localStorage.getItem('cg:remember-me')!=='0')}catch{}
+      const params=new URLSearchParams(window.location.search);
+      const incoming=params.get('mode');
+      if(incoming==='signup'||incoming==='signin')setMode(incoming);
+      const e=params.get('error');
+      if(e)setError(ERROR_COPY[e]||'Something went wrong. Try again.');
+    });
   },[]);
 
   useEffect(()=>{if(!seconds)return;const t=window.setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(t)},[seconds]);
