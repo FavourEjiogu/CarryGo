@@ -83,7 +83,7 @@ export default function Login() {
       if(mode==='signup'){
         try{localStorage.setItem('cg:pending-signup',JSON.stringify({name:name.trim(),email:email.trim().toLowerCase()}))}catch{}
       }
-      track('auth link requested',{mode,method,keep_signed_in:remember});
+      track('auth verification requested',{mode,method,keep_signed_in:remember});
       setSent(true);setCode('');setSeconds(30);
     }catch(e){setError(e instanceof Error?e.message:'Could not send your verification message.');}
     finally{setBusy(false)}
@@ -101,7 +101,7 @@ export default function Login() {
         type:'email',
       });
       if(verifyError){setError(verifyError.message);return;}
-      track('auth link requested',{mode,method:'otp_verified',keep_signed_in:remember});
+      track('auth verification requested',{mode,method:'otp_verified',keep_signed_in:remember});
       await finishAuthentication();
     }catch(e){setError(e instanceof Error?e.message:'That code could not be verified.');}
     finally{setBusy(false)}
