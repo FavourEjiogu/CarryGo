@@ -6,7 +6,7 @@ export default function Home(){
  useEffect(()=>{fetch('/api/dashboard').then(r=>r.ok?r.json():Promise.resolve({authenticated:false})).then(setD).catch(()=>setD({authenticated:false}))},[]);
  const first=d?.profile?.display_name?d.profile.display_name.split(' ')[0]:'there';
  return <AppShell><main className="shell app-page">
-  <div className="page-top"><div><div className="eyebrow">BINGHAM · KARU</div><h1 className="app-title">{d?.authenticated?'Hi, '+first+'.':'Get something done.'}</h1><p className="sub">The campus execution app. Less typing, less waiting.</p></div><span className="open-state">05:00–22:00</span></div>
+  <div className="page-top"><div><div className="eyebrow">BINGHAM · KARU</div><h1 className="app-title">{d?.authenticated?'Hi, '+first+'.':'Get something done.'}</h1><p className="sub">The campus execution app. Less typing, less waiting. Full marketplace 05:00–22:00; hostel delivery remains available overnight.</p></div><span className="open-state">05:00–22:00 full · 22:00–05:00 hostel only</span></div>
   <section className="home-actions">
     <Link href="/do" className="action-tile primary"><small>NEED SOMETHING</small><strong>Tell CarryGo what to do</strong><span>Food, groceries, pickup, printing and campus jobs.</span><i>→</i></Link>
     <Link href="/earn" className="action-tile"><small>WANT TO EARN</small><strong>Take something on your route</strong><span>Set the fee and the time. You stay in control.</span><i>→</i></Link>
