@@ -231,3 +231,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(prefers-reduced-motion:reduce){
   .home-action-card:hover{transform:none}
 }
+
+.smart-route{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;margin:-2px 0 13px;border:1px solid var(--line);background:#f7f8f3;border-radius:13px}
+.smart-route>div{display:flex;align-items:center;gap:9px;min-width:0}
+.smart-route span{display:grid;gap:2px;min-width:0}
+.smart-route b{font-size:9px;letter-spacing:.02em}
+.smart-route small{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.smart-route .text-link{font-size:9px;white-space:nowrap}
+.destination-wrap{position:relative}
+.swap-locations{position:absolute;left:50%;bottom:-19px;transform:translateX(-50%);z-index:4;width:30px;height:30px;border:1px solid var(--line);border-radius:999px;background:var(--paper);display:grid;place-items:center;box-shadow:0 8px 24px rgba(11,13,12,.1)}
+@media(max-width:620px){.smart-route{align-items:flex-start}.swap-locations{bottom:auto;top:50%;margin-top:11px}}
