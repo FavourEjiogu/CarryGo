@@ -4,6 +4,7 @@ import posthog from 'posthog-js';
 
 type AnalyticsEvent =
   | 'auth verification requested'
+  | 'auth verification completed'
   | 'onboarding step completed'
   | 'onboarding completed';
 
