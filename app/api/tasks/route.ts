@@ -8,7 +8,8 @@ export async function GET(request:Request){
  let q=s.from('errands').select('id,title,description,category,estimated_item_cost_kobo,proposed_runner_fee_kobo,proposed_eta_minutes,payer_deadline_at,runner_preference,delivery_mode,delivery_room,scheduled_for,same_gender_premium_kobo,status,created_at,pickup_location_text,destination_location_text,payer_id,runner_id,service_fee_kobo,service_fee_discount_kobo').order('created_at',{ascending:false}).limit(50);
  if(mine) q=q.or('payer_id.eq.'+user.id+',runner_id.eq.'+user.id); else {q=q.in('status',['OPEN','NEGOTIATING']);if(overnight())q=q.in('delivery_mode',['HOSTEL','ROOM'])}
  const{data,error}=await q;if(error)return NextResponse.json({error:'Could not load tasks.'},{status:400});
- return NextResponse.json({tasks:data||[],open:true,full_marketplace:fullMarketplaceOpen(),overnight_hostel_only:overnight()})
+ const tasks=(data||[]).map(task=>!mine&&task.delivery_mode==='ROOM'?{...task,delivery_room:null}:task);
+ return NextResponse.json({tasks,open:true,full_marketplace:fullMarketplaceOpen(),overnight_hostel_only:overnight()})
 }
 export async function POST(request:Request){
  const s=await createSupabaseServerClient();const{data:{user}}=await s.auth.getUser();if(!user)return NextResponse.json({error:'Sign in required'},{status:401});
