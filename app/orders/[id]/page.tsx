@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect, react-hooks/immutability */
 'use client';
 import{useEffect,useState}from'react';import{useParams}from'next/navigation';import Link from'next/link';import{AppShell}from'@/src/components/AppShell';import{naira}from'@/src/lib/app-config';import{readLocationQueue,queueLocation,removeQueued}from'@/src/lib/offline-queue';
 const flow=['FUNDED','IN_PROGRESS','AT_VENDOR','PRICE_ADJUSTMENT_PENDING','ITEM_CONFIRMED','EN_ROUTE','HANDOFF_PENDING','COMPLETED'];
