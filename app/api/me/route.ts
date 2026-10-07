@@ -11,5 +11,6 @@ export async function GET() {
     s.from('user_credits').select('balance_kobo').eq('user_id', user.id).maybeSingle(),
     s.rpc('get_wallet_summary', { p_user_id: user.id }),
   ]);
-  return NextResponse.json({ user: { id: user.id, email: user.email }, profile: p.data, streak: streak.data, credit_kobo: Number(credit.data?.balance_kobo || 0), wallet: wallet.data || null });
+  const profile = p.data ? { ...p.data, display_name: p.data.display_name || user.user_metadata?.display_name || null } : p.data;
+  return NextResponse.json({ user: { id: user.id, email: user.email }, profile, streak: streak.data, credit_kobo: Number(credit.data?.balance_kobo || 0), wallet: wallet.data || null });
 }
