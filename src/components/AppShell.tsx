@@ -19,7 +19,7 @@ export function AppShell({children}:{children:React.ReactNode}){
       <div className="header-right">{!online&&<span className="offline-pill"><span/>Offline mode</span>}<Link className="header-icon-link" href="/notifications" aria-label="Inbox"><Icon name="bell" size={18}/></Link><Link className="avatar" href="/profile"><Icon name="user" size={16}/><span>You</span></Link></div>
     </div></header>
     <main><motion.div className="route-stage" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:.25,ease:[.22,1,.36,1]}}>{children}</motion.div></main>
-    <nav className="mobile-nav" aria-label="Primary navigation">{nav.map(([href,label,icon])=><Link key={href} href={href} className={active(href)?'active':''}>{active(href)&&<motion.i layoutId="nav-active" className="nav-active"/>}<Icon name={icon} size={18}/><span>{label}</span></Link>)}</nav>
-    <footer className="app-footer shell"><span>CarryGo · Bingham University, Karu</span><span><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></span></footer>
+    <nav className="mobile-nav" aria-label="Primary navigation">{nav.map(([href,label,icon])=><Link key={href} href={href} className={active(href)?'active':''} aria-current={active(href)?'page':undefined}>{active(href)&&<motion.i layoutId="nav-active" className="nav-active"/>}<Icon name={icon} size={18}/><span>{label}</span></Link>)}</nav>
+    <footer className="app-footer shell"><span>CarryGo · Your campus, your network.</span><span><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></span></footer>
   </div>
 }
