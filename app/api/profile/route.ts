@@ -1,22 +1,4 @@
-import { NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '@/src/lib/supabase/server';
-export async function PATCH(request: Request) {
-  const s = await createSupabaseServerClient();
-  const { data: { user } } = await s.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Sign in required' }, { status: 401 });
-  const b = await request.json();
-  const patch = {
-    display_name: String(b.display_name || '').trim(),
-    phone_number: b.phone_number ? String(b.phone_number).trim() : null,
-    gender: b.gender || 'UNSPECIFIED',
-    faculty_id: b.faculty_id || null,
-    department_id: b.department_id || null,
-    birthday_month: b.birthday_month || null,
-    birthday_day: b.birthday_day || null,
-  };
-  if (!patch.display_name) return NextResponse.json({ error: 'Name is required' }, { status: 400 });
-  const { data, error } = await s.from('users').update(patch).eq('id', user.id).select('id,username,display_name,email,phone_number,campus_id,role,verification_level,gender,faculty_id,department_id,birthday_month,birthday_day').single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  await s.from('user_public_profiles').update({ display_name: data.display_name }).eq('user_id', user.id);
-  return NextResponse.json({ profile: data });
-}
+import{NextResponse}from'next/server';import{createSupabaseServerClient}from'@/src/lib/supabase/server';
+export async function PATCH(request:Request){const s=await createSupabaseServerClient();const{data:{user}}=await s.auth.getUser();if(!user)return NextResponse.json({error:'Sign in required'},{status:401});const{data:allowed,error:rateError}=await s.rpc('consume_rate_limit',{p_scope:'profile-update',p_limit:10,p_window_seconds:600});if(rateError)return NextResponse.json({error:'Could not verify request limits. Try again.'},{status:503});if(!allowed)return new NextResponse(JSON.stringify({error:'Too many profile changes. Try again in a few minutes.'}),{status:429,headers:{'content-type':'application/json','retry-after':'60'}});
+const b=await request.json().catch(()=>({})),gender=['UNSPECIFIED','MALE','FEMALE'].includes(String(b.gender))?String(b.gender):'UNSPECIFIED';const patch={display_name:String(b.display_name||'').trim().slice(0,120),phone_number:b.phone_number?String(b.phone_number).trim().slice(0,32):null,gender,faculty_id:b.faculty_id||null,department_id:b.department_id||null,birthday_month:b.birthday_month?Number(b.birthday_month):null,birthday_day:b.birthday_day?Number(b.birthday_day):null};if(patch.display_name.length<2)return NextResponse.json({error:'Name is required'},{status:400});if(patch.phone_number&&!/^(?:\+234|0)[789]\d{9}$/.test(patch.phone_number.replace(/\s+/g,'')))return NextResponse.json({error:'Enter a valid Nigerian mobile number.'},{status:400});if(patch.birthday_month!==null&&(!Number.isInteger(patch.birthday_month)||patch.birthday_month<1||patch.birthday_month>12))return NextResponse.json({error:'Birthday month is invalid.'},{status:400});if(patch.birthday_day!==null&&(!Number.isInteger(patch.birthday_day)||patch.birthday_day<1||patch.birthday_day>31))return NextResponse.json({error:'Birthday day is invalid.'},{status:400});
+const{data,error}=await s.from('users').update(patch).eq('id',user.id).select('id,username,display_name,email,phone_number,campus_id,role,verification_level,gender,faculty_id,department_id,birthday_month,birthday_day').single();if(error)return NextResponse.json({error:'Could not save profile.'},{status:400});const{error:publicError}=await s.from('user_public_profiles').update({display_name:data.display_name}).eq('user_id',user.id);if(publicError)return NextResponse.json({error:'Profile saved, but public profile sync failed.'},{status:502});return NextResponse.json({profile:data})}
