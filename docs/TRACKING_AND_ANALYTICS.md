@@ -56,9 +56,9 @@ At minimum:
 - completion confirmed.
 
 The product analytics layer currently starts with the highest-value account funnel:
-- auth_link_requested;
-- onboarding_step_completed;
-- onboarding_completed.
+- auth link requested;
+- onboarding step completed;
+- onboarding completed.
 
 These events contain no email address, name, phone number, campus identifier, wallet balance, task identifier or location. The browser SDK is configured with automatic click capture and session recording disabled, in-memory persistence, and respect for browser Do Not Track.
 
