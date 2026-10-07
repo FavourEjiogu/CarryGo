@@ -12,6 +12,7 @@ type Mode = 'signin' | 'signup';
 const ERROR_COPY: Record<string,string> = {
   missing_code: 'That sign-in link is incomplete. Request a fresh one.',
   auth_failed: 'That link could not be verified. Request a fresh one and try again.',
+  auth_config: 'Sign-in is temporarily misconfigured for this deployment. Use the latest CarryGo link or contact the team.',
 };
 
 export default function Login() {
