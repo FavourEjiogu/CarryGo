@@ -1,5 +1,5 @@
 'use client';
-import{useCallback,useEffect,useMemo,useState}from'react';import{useParams,useRouter}from'next/navigation';import Link from'next/link';import{AppShell}from'@/src/components/AppShell';import{naira}from'@/src/lib/app-config';import{readLocationQueue,queueLocation,removeQueued}from'@/src/lib/offline-queue';
+import{useCallback,useEffect,useState}from'react';import{useParams,useRouter}from'next/navigation';import Link from'next/link';import{AppShell}from'@/src/components/AppShell';import{naira}from'@/src/lib/app-config';import{readLocationQueue,queueLocation,removeQueued}from'@/src/lib/offline-queue';
 const flow=['FUNDED','IN_PROGRESS','AT_VENDOR','PRICE_ADJUSTMENT_PENDING','ITEM_CONFIRMED','EN_ROUTE','HANDOFF_PENDING','COMPLETED'];
 const terminal=new Set(['COMPLETED','CANCELLED','EXPIRED','FAILED','DISPUTED','ABANDONED']);
 function pct(value:any){const n=Number(value||0);return n<=1?Math.round(n*100):Math.round(n)}
@@ -23,7 +23,7 @@ export default function Order(){const{id}=useParams<{id:string}>();const router=
  if(!t)return <AppShell><main className="shell app-page"><div className="card form"><h2>Loading task…</h2></div></main></AppShell>;
  const idx=flow.indexOf(t.status),latest=adjustments[0],payer=t.payer_id===viewer,runner=t.runner_id===viewer;
  const action=actionFor(t.status,payer,runner);
- const sortedBids=useMemo(()=>[...bids].sort((a,b)=>sort==='fee'?Number(a.fee_kobo)-Number(b.fee_kobo):sort==='eta'?Number(a.eta_minutes)-Number(b.eta_minutes):offerScore(b)-offerScore(a)),[bids,sort]);
+ const sortedBids=[...bids].sort((a,b)=>sort==='fee'?Number(a.fee_kobo)-Number(b.fee_kobo):sort==='eta'?Number(a.eta_minutes)-Number(b.eta_minutes):offerScore(b)-offerScore(a));
  const nextRunnerStatus=t.status==='FUNDED'?'IN_PROGRESS':t.status==='IN_PROGRESS'?'AT_VENDOR':t.status==='AT_VENDOR'?'ITEM_CONFIRMED':t.status==='ITEM_CONFIRMED'?'EN_ROUTE':t.status==='EN_ROUTE'?'HANDOFF_PENDING':null;
  return <AppShell><main className="shell app-page">
   <div className="page-top"><div><div className="eyebrow">TASK · {t.status.replaceAll('_',' ')}</div><h1 className="app-title">{t.title}</h1><p className="sub">{t.pickup_location_text} → {t.destination_location_text}{t.delivery_mode==='ROOM'?' · same-gender room':''}</p></div><Link className="btn ghost" href="/orders">Orders</Link></div>
