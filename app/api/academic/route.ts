@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/src/lib/supabase/server';
+import { createSupabaseAdminClient } from '@/src/lib/supabase/admin';
 
 export async function GET(request: Request) {
   const s = await createSupabaseServerClient();
@@ -12,12 +13,13 @@ export async function GET(request: Request) {
   const campusId = requestedCampusId || profile?.campus_id;
   if (!campusId) return NextResponse.json({ faculties: [], departments: [] });
 
-  const { data: campus } = await s.from('campuses').select('id').eq('id', campusId).eq('is_active', true).maybeSingle();
+  const admin = createSupabaseAdminClient();
+  const { data: campus } = await admin.from('campuses').select('id').eq('id', campusId).eq('is_active', true).maybeSingle();
   if (!campus) return NextResponse.json({ error: 'Campus is not available' }, { status: 404 });
 
   const [f, d] = await Promise.all([
-    s.from('faculties').select('id,name,structure_type').eq('campus_id', campusId).eq('is_active', true).order('name'),
-    s.from('academic_departments').select('id,faculty_id,name').eq('campus_id', campusId).eq('is_active', true).order('name'),
+    admin.from('faculties').select('id,name,structure_type').eq('campus_id', campusId).eq('is_active', true).order('name'),
+    admin.from('academic_departments').select('id,faculty_id,name').eq('campus_id', campusId).eq('is_active', true).order('name'),
   ]);
   if (f.error || d.error) return NextResponse.json({ error: (f.error || d.error)?.message }, { status: 400 });
   return NextResponse.json({ faculties: f.data || [], departments: d.data || [] }, { headers: { 'Cache-Control': 'private, max-age=60' } });
