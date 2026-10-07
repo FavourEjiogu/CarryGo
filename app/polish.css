@@ -130,3 +130,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
 }
+
+.app-footer{display:flex;justify-content:space-between;gap:16px;padding:0 0 34px;color:var(--muted);font-size:9px}.app-footer span:last-child{display:flex;gap:14px}.app-footer a{text-decoration:underline;text-underline-offset:3px}.legal-copy{padding:28px}.legal-copy h2{font-size:18px;letter-spacing:-.04em;margin:10px 0 0}.legal-copy p{font-size:11px;line-height:1.75;color:var(--muted);margin:4px 0 12px}.legal-copy h2:first-child{margin-top:0}@media(max-width:620px){.app-footer{padding-bottom:110px;display:grid;gap:8px}.app-footer span:last-child{gap:12px}}
