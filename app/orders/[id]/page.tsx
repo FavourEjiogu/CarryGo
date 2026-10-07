@@ -1,1 +1,96 @@
-'use client'; import Link from 'next/link'; import {useEffect,useState} from 'react'; import {AppShell} from '@/src/components/AppShell'; import {shouldSendPoint,type TrackingPoint} from '@/src/lib/tracking'; const path=[{x:30,y:59},{x:37,y:56},{x:45,y:52},{x:53,y:55},{x:62,y:57}]; export default function Track(){const[sharing,setSharing]=useState(false),[tick,setTick]=useState(0),[last,setLast]=useState<TrackingPoint|null>(null),[queue,setQueue]=useState(0);useEffect(()=>{const id=setInterval(()=>setTick(x=>x+1),3000);return()=>clearInterval(id)},[]);useEffect(()=>{if(!sharing||!navigator.geolocation)return;const id=navigator.geolocation.watchPosition(p=>{const next={latitude:p.coords.latitude,longitude:p.coords.longitude,accuracyM:p.coords.accuracy,capturedAt:new Date().toISOString(),sequence:(last?.sequence??0)+1};if(shouldSendPoint(last,next)){setLast(next);setQueue(q=>q+1)}},()=>{}, {enableHighAccuracy:true,maximumAge:15000,timeout:12000});return()=>navigator.geolocation.clearWatch(id)},[sharing,last]);const node=path[tick%path.length];return <AppShell><main className="shell page-pad"><div className="pill">ACTIVE DELIVERY · CG-1001</div><div className="split-head"><div><h1>Omega → <em>Portfolio 214</em></h1><p className="lead">Same-gender room delivery · runner @chisom</p></div><span className="live">● {sharing?'TRACKING':'MATCHED'}</span></div><div className="track-grid card"><div className="tracking-map"><div className="road r1"/><div className="road r2"/><div className="track-user" style={{left:'70%',top:'58%'}}>U</div><div className="track-runner" style={{left:node.x+'%',top:node.y+'%'}}>R</div><span className="map-tag">Runner moving</span></div><div className="track-side"><div><small>ETA</small><b>8 min</b><span>640 m remaining</span></div><div><small>LAST RUNNER PING</small><b>12 sec ago</b><span>accuracy ≈ 18 m</span></div><button className={'btn '+(sharing?'lime':'dark')} onClick={()=>setSharing(!sharing)}>{sharing?'Stop sharing':'Share my live location'}</button>{queue>0&&<div className="note">{queue} location update{queue>1?'s':''} queued / captured.</div>}</div></div><div className="timeline">{[['09:58','Funded'],['10:02','Pickup confirmed'],['10:05','At vendor'],['—','En route'],['—','Handoff'],['—','Completed']].map((x,i)=><div className={i<3?'on':''} key={x[0]+x[1]}><small>{x[0]}</small><b>{x[1]}</b></div>)}</div><div className="grid3"><div className="card feature"><small>2G MODE</small><h3>No map download required.</h3><p>Tracking and status are separate from map rendering. Failed updates queue locally.</p></div><div className="card feature"><small>ANALYTICS</small><h3>Route time is measured.</h3><p>Every milestone lets CarryGo compute p50/p90 travel and full-loop times by campus route.</p></div><div className="card feature"><small>PROOF</small><h3>Handoff PIN closes the loop.</h3><p>Completion records the actual end time for the delivery.</p></div></div><Link className="btn ghost" href="/orders">← Orders</Link></main></AppShell>}
+'use client';
+
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { AppShell } from '@/src/components/AppShell';
+import { shouldSendPoint, type TrackingPoint } from '@/src/lib/tracking';
+
+const path = [{ x: 30, y: 59 }, { x: 37, y: 56 }, { x: 45, y: 52 }, { x: 53, y: 55 }, { x: 62, y: 57 }];
+
+export default function TrackPage() {
+  const [locationState, setLocationState] = useState<'starting'|'live'|'denied'>('starting');
+  const [tick, setTick] = useState(0);
+  const [last, setLast] = useState<TrackingPoint | null>(null);
+  const [updates, setUpdates] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setTick((value) => value + 1), 3000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setLocationState('denied');
+      return;
+    }
+
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const next: TrackingPoint = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracyM: position.coords.accuracy,
+          capturedAt: new Date().toISOString(),
+          sequence: (last?.sequence ?? 0) + 1,
+        };
+        if (shouldSendPoint(last, next)) {
+          setLast(next);
+          setUpdates((value) => value + 1);
+          setLocationState('live');
+        }
+      },
+      () => setLocationState('denied'),
+      { enableHighAccuracy: true, maximumAge: 15000, timeout: 12000 },
+    );
+
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, [last]);
+
+  const node = path[tick % path.length];
+
+  return (
+    <AppShell>
+      <main className="shell page-pad">
+        <div className="pill">ACTIVE DELIVERY · CG-1001</div>
+        <div className="split-head">
+          <div>
+            <h1>Omega → <em>Portfolio 214</em></h1>
+            <p className="lead">Same-gender room delivery · runner @chisom</p>
+          </div>
+          <span className="live">● {locationState === 'live' ? 'TRACKING LIVE' : locationState === 'denied' ? 'LOCATION UNAVAILABLE' : 'STARTING TRACKING'}</span>
+        </div>
+
+        <div className="track-grid card">
+          <div className="tracking-map">
+            <div className="road r1" />
+            <div className="road r2" />
+            <div className="track-user" style={{ left: '70%', top: '58%' }}>U</div>
+            <div className="track-runner" style={{ left: node.x + '%', top: node.y + '%' }}>R</div>
+            <span className="map-tag">Runner moving · live task</span>
+          </div>
+          <div className="track-side">
+            <div><small>ETA</small><b>8 min</b><span>640 m remaining</span></div>
+            <div><small>RUNNER LOCATION</small><b>Live</b><span>Latest participant position</span></div>
+            <div><small>YOUR LOCATION</small><b>{locationState === 'live' ? 'Live' : 'Permission needed'}</b><span>{last ? `±${Math.round(last.accuracyM ?? 0)} m accuracy` : 'Active-delivery location sharing'}</span></div>
+            {updates > 0 && <div className="note">{updates} compact location update{updates === 1 ? '' : 's'} captured. Weak-network buffering is enabled.</div>}
+            {locationState === 'denied' && <div className="note">Location permission is unavailable. The delivery can continue with typed locations, chat confirmation and manual checkpoints.</div>}
+          </div>
+        </div>
+
+        <div className="timeline">
+          {[['09:58','Funded'],['10:02','Pickup confirmed'],['10:05','At vendor'],['—','En route'],['—','Handoff'],['—','Completed']].map(([time,label], index) => (
+            <div className={index < 3 ? 'on' : ''} key={time + label}><small>{time}</small><b>{label}</b></div>
+          ))}
+        </div>
+
+        <div className="grid3">
+          <div className="card feature"><small>TRACKING</small><h3>Active-session only.</h3><p>Both sides share their latest location only while this delivery is active. No permanent campus surveillance.</p></div>
+          <div className="card feature"><small>2G MODE</small><h3>Location ≠ map tiles.</h3><p>GPS points and task status continue to work without downloading a heavy map.</p></div>
+          <div className="card feature"><small>ANALYTICS</small><h3>Every loop teaches us.</h3><p>Milestone timestamps feed route averages, p50/p90 travel times and total task-loop time.</p></div>
+        </div>
+
+        <Link className="btn ghost" href="/orders">← Orders</Link>
+      </main>
+    </AppShell>
+  );
+}
