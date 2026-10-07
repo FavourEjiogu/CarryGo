@@ -1,96 +1,15 @@
 'use client';
-
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { AppShell } from '@/src/components/AppShell';
-import { shouldSendPoint, type TrackingPoint } from '@/src/lib/tracking';
-
-const path = [{ x: 30, y: 59 }, { x: 37, y: 56 }, { x: 45, y: 52 }, { x: 53, y: 55 }, { x: 62, y: 57 }];
-
-export default function TrackPage() {
-  const [locationState, setLocationState] = useState<'starting'|'live'|'denied'>('starting');
-  const [tick, setTick] = useState(0);
-  const [last, setLast] = useState<TrackingPoint | null>(null);
-  const [updates, setUpdates] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => setTick((value) => value + 1), 3000);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      setLocationState('denied');
-      return;
-    }
-
-    const watchId = navigator.geolocation.watchPosition(
-      (position) => {
-        const next: TrackingPoint = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracyM: position.coords.accuracy,
-          capturedAt: new Date().toISOString(),
-          sequence: (last?.sequence ?? 0) + 1,
-        };
-        if (shouldSendPoint(last, next)) {
-          setLast(next);
-          setUpdates((value) => value + 1);
-          setLocationState('live');
-        }
-      },
-      () => setLocationState('denied'),
-      { enableHighAccuracy: true, maximumAge: 15000, timeout: 12000 },
-    );
-
-    return () => navigator.geolocation.clearWatch(watchId);
-  }, [last]);
-
-  const node = path[tick % path.length];
-
-  return (
-    <AppShell>
-      <main className="shell page-pad">
-        <div className="pill">ACTIVE DELIVERY · CG-1001</div>
-        <div className="split-head">
-          <div>
-            <h1>Omega → <em>Portfolio 214</em></h1>
-            <p className="lead">Same-gender room delivery · runner @chisom</p>
-          </div>
-          <span className="live">● {locationState === 'live' ? 'TRACKING LIVE' : locationState === 'denied' ? 'LOCATION UNAVAILABLE' : 'STARTING TRACKING'}</span>
-        </div>
-
-        <div className="track-grid card">
-          <div className="tracking-map">
-            <div className="road r1" />
-            <div className="road r2" />
-            <div className="track-user" style={{ left: '70%', top: '58%' }}>U</div>
-            <div className="track-runner" style={{ left: node.x + '%', top: node.y + '%' }}>R</div>
-            <span className="map-tag">Runner moving · live task</span>
-          </div>
-          <div className="track-side">
-            <div><small>ETA</small><b>8 min</b><span>640 m remaining</span></div>
-            <div><small>RUNNER LOCATION</small><b>Live</b><span>Latest participant position</span></div>
-            <div><small>YOUR LOCATION</small><b>{locationState === 'live' ? 'Live' : 'Permission needed'}</b><span>{last ? `±${Math.round(last.accuracyM ?? 0)} m accuracy` : 'Active-delivery location sharing'}</span></div>
-            {updates > 0 && <div className="note">{updates} compact location update{updates === 1 ? '' : 's'} captured. Weak-network buffering is enabled.</div>}
-            {locationState === 'denied' && <div className="note">Location permission is unavailable. The delivery can continue with typed locations, chat confirmation and manual checkpoints.</div>}
-          </div>
-        </div>
-
-        <div className="timeline">
-          {[['09:58','Funded'],['10:02','Pickup confirmed'],['10:05','At vendor'],['—','En route'],['—','Handoff'],['—','Completed']].map(([time,label], index) => (
-            <div className={index < 3 ? 'on' : ''} key={time + label}><small>{time}</small><b>{label}</b></div>
-          ))}
-        </div>
-
-        <div className="grid3">
-          <div className="card feature"><small>TRACKING</small><h3>Active-session only.</h3><p>Both sides share their latest location only while this delivery is active. No permanent campus surveillance.</p></div>
-          <div className="card feature"><small>2G MODE</small><h3>Location ≠ map tiles.</h3><p>GPS points and task status continue to work without downloading a heavy map.</p></div>
-          <div className="card feature"><small>ANALYTICS</small><h3>Every loop teaches us.</h3><p>Milestone timestamps feed route averages, p50/p90 travel times and total task-loop time.</p></div>
-        </div>
-
-        <Link className="btn ghost" href="/orders">← Orders</Link>
-      </main>
-    </AppShell>
-  );
-}
+import{useEffect,useState}from'react';import{useParams}from'next/navigation';import Link from'next/link';import{AppShell}from'@/src/components/AppShell';import{readLocationQueue,queueLocation,removeQueued}from'@/src/lib/offline-queue';
+const statusOrder=['FUNDED','IN_PROGRESS','AT_VENDOR','ITEM_CONFIRMED','EN_ROUTE','HANDOFF_PENDING','COMPLETED'];
+const nextStatus:any={FUNDED:'IN_PROGRESS',IN_PROGRESS:'AT_VENDOR',AT_VENDOR:'ITEM_CONFIRMED',ITEM_CONFIRMED:'EN_ROUTE',EN_ROUTE:'HANDOFF_PENDING'};
+export default function Order(){const{id}=useParams<{id:string}>();const[t,setT]=useState<any>(null),[viewer,setViewer]=useState(''),[bids,setBids]=useState<any[]>([]),[messages,setMessages]=useState<any[]>([]),[body,setBody]=useState(''),[err,setErr]=useState(''),[tracking,setTracking]=useState<any>(null),[trackOn,setTrackOn]=useState(false),[busy,setBusy]=useState(false);
+async function load(){const[a,b,m,l]=await Promise.all([fetch('/api/tasks/'+id).then(r=>r.json()),fetch('/api/tasks/'+id+'/bids').then(r=>r.json()),fetch('/api/tasks/'+id+'/messages').then(r=>r.json()).catch(()=>({messages:[]})),fetch('/api/tasks/'+id+'/location').then(r=>r.json()).catch(()=>({session:null}))]);setT(a.task);setViewer(a.viewer_id||m.viewer_id||'');setBids(b.bids||[]);setMessages(m.messages||[]);setTracking(l)}
+useEffect(()=>{load();const tm=setInterval(load,5000);return()=>clearInterval(tm)},[id]);
+useEffect(()=>{if(!trackOn||!navigator.geolocation)return;let seq=Number(localStorage.getItem('cg:seq:'+id)||0);const send=(p:GeolocationPosition)=>{seq+=1;localStorage.setItem('cg:seq:'+id,String(seq));const x={taskId:id,latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy_m:p.coords.accuracy,captured_at:new Date().toISOString(),sequence:seq};const post=()=>fetch('/api/tasks/'+id+'/location',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(x)}).then(()=>removeQueued(id,seq)).catch(()=>queueLocation(x));if(navigator.onLine)post();else queueLocation(x)};const watch=navigator.geolocation.watchPosition(send,()=>setErr('Location permission was not granted. Chat and checkpoints still work.'),{enableHighAccuracy:false,maximumAge:30000,timeout:15000});const retry=setInterval(()=>{if(!navigator.onLine)return;for(const x of readLocationQueue().filter(q=>q.taskId===id)){fetch('/api/tasks/'+id+'/location',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(x)}).then(()=>removeQueued(id,x.sequence)).catch(()=>{})}},60000);return()=>{navigator.geolocation.clearWatch(watch);clearInterval(retry)}},[id,trackOn]);
+async function message(){const x=body.trim();if(!x)return;const r=await fetch('/api/tasks/'+id+'/messages',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({body:x})});const j=await r.json();if(!r.ok){setErr(j.error);return}setBody('');setMessages(v=>[...v,j.message])}
+async function advance(s:string){setBusy(true);const r=await fetch('/api/tasks/'+id+'/status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({next_status:s})});const j=await r.json();setBusy(false);if(!r.ok){setErr(j.error);return}if(s==='IN_PROGRESS')setTrackOn(true);load()}
+async function complete(){setBusy(true);const r=await fetch('/api/tasks/'+id+'/complete',{method:'POST',headers:{'content-type':'application/json'},body:'{}'});const j=await r.json();setBusy(false);if(!r.ok){setErr(j.error);return}load()}
+async function accept(bid:string){const r=await fetch('/api/tasks/'+id+'/accept',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({bid_id:bid})});const j=await r.json();if(!r.ok){setErr(j.error);return}location.href=j.redirect}
+if(!t)return <AppShell><main className="shell page-pad"><div className="card form"><h2>Loading task…</h2></div></main></AppShell>;
+const idx=statusOrder.indexOf(t.status);
+return <AppShell><main className="shell page-pad"><div className="pill">TASK · {t.status}</div><div className="split-head"><div><h1>{t.title}</h1><p className="lead">{t.pickup_location_text} → {t.destination_location_text}{t.delivery_mode==='ROOM'?' · same-gender room':''}</p></div><span className="live">● LIVE</span></div>{err&&<div className="error">{err}</div>}<div className="track-grid card"><div className="tracking-map"><div className="road r1"/><div className="road r2"/><div className="track-user" style={{left:'72%',top:'60%'}}>U</div><div className="track-runner" style={{left:'40%',top:'52%'}}>R</div><span className="map-tag">Active delivery · no map API required</span></div><div className="track-side"><small>STATUS</small><b>{t.status.replaceAll('_',' ')}</b><span>{tracking?.session?'Participant tracking active':'Tracking starts when the runner starts.'}</span>{tracking?.session&&<div className="note">Runner: {tracking.session.last_runner_at?new Date(tracking.session.last_runner_at).toLocaleTimeString():'—'}<br/>Customer: {tracking.session.last_payer_at?new Date(tracking.session.last_payer_at).toLocaleTimeString():'—'}</div>}<button className={'btn '+(trackOn?'lime':'dark')} onClick={()=>setTrackOn(v=>!v)}>{trackOn?'Location sharing on':'Share my location'}</button></div></div><div className="timeline">{statusOrder.map((s,i)=><div key={s} className={i<=idx?'on':''}><small>{i+1}</small><b>{s}</b></div>)}</div>{(t.status==='OPEN'||t.status==='NEGOTIATING')&&<section className="section"><div className="eyebrow">OFFERS</div><h2>Price + time.</h2><div className="task-list">{bids.map(b=><article className="card task" key={b.id}><div><b>{b.runner?.display_name||'Runner'}</b><span>{b.message||'No message'} · {b.eta_minutes} min · float {b.runner_float_capacity_kobo/100}</span></div><div className="task-action"><strong>₦{Math.round(b.fee_kobo/100).toLocaleString()}</strong>{t.payer_id===viewer&&<button className="btn dark" onClick={()=>accept(b.id)}>Accept</button>}</div></article>)}</div></section>}{t.status==='AGREED'&&t.payer_id===viewer&&<Link className="btn dark" href={'/fund/'+id}>Fund task →</Link>}{t.runner_id===viewer&&nextStatus[t.status]&&<button className="btn dark" disabled={busy} onClick={()=>advance(nextStatus[t.status])}>Mark {nextStatus[t.status].replaceAll('_',' ').toLowerCase()} →</button>}{t.status==='HANDOFF_PENDING'&&<button className="btn lime" disabled={busy} onClick={complete}>Confirm handoff + complete</button>}<section className="section"><div className="eyebrow">CHAT</div><h2>Confirm the little things.</h2><div className="card chat"><div className="chat-list">{messages.map(m=><div className={m.sender_id===viewer?'bubble me':'bubble'} key={m.id}>{m.body}<small>{new Date(m.created_at).toLocaleTimeString()}</small></div>)}</div><div className="chat-compose"><input value={body} onChange={e=>setBody(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')message()}} placeholder="e.g. Which building is the pickup?" /><button className="btn dark" onClick={message}>Send</button></div></div></section><Link className="btn ghost" href="/orders">← Orders</Link></main></AppShell>}
