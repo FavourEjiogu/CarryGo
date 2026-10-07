@@ -1,0 +1,7 @@
+import{NextResponse}from'react';import{createSupabaseServerClient}from'@/src/lib/supabase/server';
+export async function GET(){const s=await createSupabaseServerClient();const{data:{user}}=await s.auth.getUser();if(!user)return NextResponse.json({authenticated:false},{status:401});const [{data:streak},{data:tasks},{count:openCount},{data:profile}]=await Promise.all([
+s.from('user_streaks').select('current_weeks,best_weeks,discount_percent,rescue_tokens,sponsored_task_unlocked').eq('user_id',user.id).maybeSingle(),
+s.from('errands').select('id,title,status,delivery_mode,pickup_location_text,destination_location_text,proposed_runner_fee_kobo,scheduled_for,created_at').or('payer_id.eq.'+user.id+',runner_id.eq.'+user.id).not('status','in','(COMPLETED,CANCELLED,EXPIRED,FAILED)').order('created_at',{ascending:false}).limit(3),
+s.from('errands').select('id',{count:'exact',head:true}).in('status',['OPEN','NEGOTIATING']).eq('campus_id','00000000-0000-0000-0000-000000000001'),
+s.from('users').select('display_name,verification_level').eq('id',user.id).single()
+]);return NextResponse.json({authenticated:true,profile,streak,tasks:tasks||[],openTaskCount:openCount||0})}
