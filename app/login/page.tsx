@@ -152,8 +152,7 @@ export default function Login() {
                 <button className="btn dark full" type="button" disabled={seconds>0||busy} onClick={sendCode}>{seconds>0?'Resend in '+seconds+'s':'Resend link'}</button>
               </>}
 
-              <button className="btn ghost full" type="button" onClick={()=>{setSent(false);setCode('');setError('')}}>Use a different method</button>
-              <button className="text-link auth-method-back" type="button" onClick={()=>{setSent(false);setCode('');setError('')}}>Back</button>
+              <button className="btn ghost full" type="button" onClick={()=>{setMethod(method==='otp'?'link':'otp');setSent(false);setCode('');setError('')}}>Use a different method: {method==='otp'?'Magic link':'One-time code'}</button>
             </motion.div> : <motion.div key="form" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}}>
               <div className="auth-kicker">{mode==='signup'?'FIRST TIME HERE':'SIGN IN'}</div>
               <h1>{title}</h1>
