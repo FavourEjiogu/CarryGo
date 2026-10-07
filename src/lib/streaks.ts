@@ -1,0 +1,6 @@
+export const MAX_STREAK_WEEKS=20, WEEKLY_STREAK_DISCOUNT=5, MAX_DISCOUNT=100, MAX_RESCUE_TOKENS=2, RESCUE_EVERY_WEEKS=4, SPONSORED_FREE_TASK_CAP_KOBO=150000; export const BIRTHDAY_BOOST=5, SEMESTER_BOOST=5, MERCHANT_BOOST=5;
+export function bankPercentFromWeeks(weeks:number){return Math.min(100,Math.max(0,Math.floor(weeks))*5)}
+export function redeemDiscount(available:number,requested:number){const used=Math.min(Math.max(0,Math.floor(requested)),Math.min(100,Math.max(0,Math.floor(available))));return{usedPercent:used,remainingPercent:Math.max(0,Math.floor(available)-used)}}
+export function redeemableServiceFee(serviceFeeKobo:number,discountPercent:number){return Math.round(Math.max(0,serviceFeeKobo)*(100-Math.min(100,Math.max(0,discountPercent)))/100)}
+export function qualifyStreak(current:number,qualified:boolean,best=current,bank=bankPercentFromWeeks(current),rescueTokens=0){const safe=Math.min(20,Math.max(0,Math.floor(current)));const next=qualified?Math.min(20,safe+1):0;const nextBank=Math.min(100,Math.max(0,bank)+(qualified?5:0));return{currentWeeks:next,bestWeeks:Math.max(best,next),discountPercent:nextBank,rescueTokens:Math.min(MAX_RESCUE_TOKENS,Math.max(0,rescueTokens)),freeTaskUnlocked:next>=20||best>=20}}
+export function rescueTokensForBestStreak(best:number){return Math.min(2,Math.floor(Math.max(0,best)/4))}
