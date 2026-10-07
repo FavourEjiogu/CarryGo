@@ -65,3 +65,20 @@ These events contain no email address, name, phone number, campus identifier, wa
 ## Privacy
 
 Raw location is operational telemetry, not a product to sell. Retain it only as long as justified, aggregate route data, and avoid exposing a user's historical route trail.
+
+## Product intelligence signals
+
+The client-side analytics layer tracks only coarse interaction signals:
+- `auth verification requested`;
+- `auth verification completed`;
+- `onboarding step completed`;
+- `onboarding completed`;
+- `task route detected`;
+- `task route applied`;
+- `route suggestion applied`.
+
+Route strings, account identifiers, email, phone, task IDs, wallet balances and precise location are not sent as PostHog event properties.
+
+Route intelligence is calculated from completed campus tasks in Supabase. A route suggestion is withheld until at least three completed observations exist for that campus route. Suggestions expose only aggregate ETA/fee guidance.
+
+Temporary shared status uses a random opaque token stored only as a SHA-256 hash. A shared page exposes the minimum status needed for that delivery and expires automatically; it never exposes the participant account or historical location trail.
