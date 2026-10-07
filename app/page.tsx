@@ -1,5 +1,5 @@
 'use client';
-import{useEffect,useState}from'react';import Link from'react/link';import{motion}from'motion/react';import{AppShell}from'@/src/components/AppShell';import{Icon}from'@/src/components/icons';
+import{useEffect,useState}from'react';import Link from'next/link';import{motion}from'motion/react';import{AppShell}from'@/src/components/AppShell';import{Icon}from'@/src/components/icons';
 
 const signals=[['POST','Say what needs doing.'],['AGREE','Set the price + time.'],['MOVE','Watch it move.']];
 export default function Home(){
@@ -16,7 +16,7 @@ export default function Home(){
     <div className="home-trust"><span><Icon name="shield" size={13}/> Protected funding</span><span><Icon name="clock" size={13}/> Price + time agreed first</span><span><Icon name="wifi" size={13}/> 2G-first</span></div>
    </div>
    <div className="home-orbit-card" aria-hidden="true">
-    <div className="orbit-glow"/><motion.div className="float-card card-a" animate={{y:[0,-8,0],rotate:[0,1.5,0]}} transition={{duration:4,repeat:Infinity,ease:'easeInOut'}}><small>RUNNER ON THE WAY</small><b>Green Plaza → Hostel</b><span>ETA 08 min</span></motion.div>
+    <div className="orbit-glow"/><motion.div className="float-card card-a" animate={{y:[0,-8,0],rotate:[0,1.5,0]}} transition={{duration:4,repeat:Infinity,ease:'easeInOut'}}><small>RUNNER ON THE WAY</small><b>A request is moving now</b><span>ETA 08 min</span></motion.div>
     <motion.div className="float-card card-b" animate={{y:[0,8,0],rotate:[0,-1.2,0]}} transition={{duration:5,repeat:Infinity,ease:'easeInOut',delay:.3}}><small>YOUR STREAK</small><b>{d?.streak?.discount_percent||0}% banked</b><span>Use any part when you need it.</span></motion.div>
     <div className="orbit-core"><i className="brand-dot"/><strong>CarryGo</strong><span>made for campus life</span></div>
    </div>
