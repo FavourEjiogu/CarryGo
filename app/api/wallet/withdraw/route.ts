@@ -26,8 +26,9 @@ export async function POST(request:Request){
   const payoutAccountId=String(b.payout_account_id||'');
   const amount=Math.round(Number(b.amount_kobo||0));
   if(!payoutAccountId||!Number.isInteger(amount))return NextResponse.json({error:'Enter a valid withdrawal.'},{status:400});
-  const {data,reserveError}=await s.rpc('request_withdrawal',{p_payout_account_id:payoutAccountId,p_amount_kobo:amount});
+  const {data:reserveData,error:reserveError}=await s.rpc('request_withdrawal',{p_payout_account_id:payoutAccountId,p_amount_kobo:amount});
   if(reserveError)return NextResponse.json({error:reserveError.message},{status:400});
+  const data=reserveData as any;
 
   const secret=process.env.PAYSTACK_SECRET_KEY;
   if(!secret)return NextResponse.json({error:'Payments are not configured.'},{status:503});
