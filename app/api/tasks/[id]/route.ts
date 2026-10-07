@@ -36,5 +36,6 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
     const signed=await admin.storage.from('task-evidence').createSignedUrl(row.evidence_object_path,300);
     return {...row,evidence_url:signed.data?.signedUrl||null};
   }));
-  return NextResponse.json({task,agreement:agreement.data||null,runner:runner.data||null,bids:bidRows,messages:messages.data||[],adjustments:adjustmentRows,tracking:{session:location.data||null},handoff:handoff.data?.handoff||null,viewer_id:user.id},{headers:{'cache-control':'private, no-store'}});
+  const safeTask=participant||task.delivery_mode!=='ROOM'?task:{...task,delivery_room:null};
+  return NextResponse.json({task:safeTask,agreement:agreement.data||null,runner:runner.data||null,bids:bidRows,messages:messages.data||[],adjustments:adjustmentRows,tracking:{session:location.data||null},handoff:handoff.data?.handoff||null,viewer_id:user.id},{headers:{'cache-control':'private, no-store'}});
 }
