@@ -33,7 +33,7 @@ export default function Login(){
  useEffect(()=>{if(!seconds)return;const t=window.setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(t)},[seconds]);
 
  const title=useMemo(()=>mode==='signup'?<>A better way to <em>get things done.</em></>:<>Welcome <em>back.</em></>,[mode]);
- const goAfterAuth=async()=>{const supabase=getSupabaseBrowserClient(remember);const{data:aal}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();const next=safeNext(new URLSearchParams(location.search).get('next'));if(aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2'){router.replace('/mfa?next='+encodeURIComponent(next));return}const r=await fetch('/api/me',{cache:'no-store'}),j=await r.json().catch(()=>({}));if(!r.ok||!j.profile)throw new Error('Your session was created, but your account could not be loaded. Try again.');try{localStorage.removeItem('cg:pending-signup')}catch{}router.replace(j.profile.display_name&&j.profile.phone_number&&j.profile.campus_id?next:'/onboarding')};
+ const goAfterAuth=async()=>{const supabase=getSupabaseBrowserClient(remember);const{data:aal}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();const next=safeNext(new URLSearchParams(location.search).get('next'));if(aal?.nextLevel==='aal2'&&aal?.currentLevel!=='aal2'){router.replace('/mfa?next='+encodeURIComponent(next));return}const r=await fetch('/api/me',{cache:'no-store'}),j=await r.json().catch(()=>({}));if(!r.ok||!j.profile)throw new Error('Your session was created, but your account could not be loaded. Try again.');try{localStorage.removeItem('cg:pending-signup')}catch{}router.replace(j.profile.display_name&&j.profile.phone_number&&j.profile.campus_id?next:'/onboarding')};
 
  async function sendVerification(){
   setBusy(true);setError('');
