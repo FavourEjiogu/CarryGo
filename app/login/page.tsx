@@ -20,7 +20,7 @@ const ERROR_COPY:Record<string,string>={
  auth_config:'Sign-in is temporarily misconfigured. Try again or use the one-time code.',
 };
 
-const siteOrigin=()=> (process.env.NEXT_PUBLIC_SITE_URL||window.location.origin).replace(/\/$/,'');
+const siteOrigin=()=>window.location.origin.replace(/\/$/,'');
 const safeNext=(value:string|null)=>value&&value.startsWith('/')&&!value.startsWith('//')?value:'/';
 
 export default function Login(){
