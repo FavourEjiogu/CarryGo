@@ -7,7 +7,7 @@ The product is built around one mental model: Post → Agree → Move.
 The interface should reduce cognitive load at the exact moment a user is trying to do something. Screens lead with the next useful action, keep secondary details nearby, and avoid decorative UI that competes with the task.
 
 ## 2. Typography
-The latest production polish restores the earlier typography feel: the app uses a system UI sans stack rather than forcing a new display font across the product.
+The latest production polish restores the earlier typography feel: the product uses **Manrope for body/UI text and Space Grotesk for display headings**, exactly as in the pre-regression revision. This is a restoration, not a new typography system.
 Headings use heavy weight and tight tracking. Intentional emphasis uses the same purple treatment everywhere: h1/h2/h3/h4 em → purple.
 The rule is emphasis, not decoration: only the meaningful word or phrase is purple. Body copy remains neutral and readable.
 
