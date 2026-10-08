@@ -24,7 +24,7 @@ const steps=[
 
 export default function Home(){
  const[d,setD]=useState<Dashboard|null>(null);const tour=useTour('cg:tour:v1');
- useEffect(()=>{if(!tour.seen()){const t=window.setTimeout(()=>tour.start(),900);return()=>clearTimeout(t)}},[tour]);
+ useEffect(()=>{if(tour.seen())return;const t=window.setTimeout(()=>tour.start(),900);return()=>clearTimeout(t)},[tour.seen,tour.start]);
  useEffect(()=>{fetch('/api/dashboard',{cache:'no-store'}).then(async r=>r.status===401?{authenticated:false}:r.ok?r.json():{authenticated:false}).then(setD).catch(()=>setD({authenticated:false}))},[]);
  const first=useMemo(()=>d?.profile?.display_name?.trim().split(/\s+/)[0]||'there',[d]);
  const campusLabel=d?.campus?.name?(d.campus.city?d.campus.name+' · '+d.campus.city:d.campus.name):'Your campus';
