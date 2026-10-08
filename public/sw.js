@@ -1,5 +1,5 @@
 const CACHE='carrygo-v9';
-const SHELL=['/','/login','/do','/earn','/campus','/orders','/you','/wallet','/merchants','/profile','/offline','/manifest.webmanifest','/icon.svg'];
+const SHELL=['/','/login','/do','/earn','/campus','/orders','/you','/wallet','/merchants','/profile','/offline','/manifest.webmanifest','/icon.svg','/icon-192.png','/icon-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(
