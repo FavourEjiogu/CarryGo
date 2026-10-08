@@ -32,7 +32,7 @@ export default function NotificationsPage(){
 
   if(error)return <AppShell><main className="shell app-page narrow"><div className="card success"><h2>{error}</h2><Link className="btn dark" href="/login">Sign in</Link></div></main></AppShell>;
   return <AppShell><MotionPage className="shell app-page narrow">
-    <div className="page-top"><div><div className="eyebrow">INBOX</div><h1 className="app-title">Keep moving.</h1><p className="sub">Offers, task updates, wallet events and useful CarryGo nudges.</p></div>{items.some(x=>!x.read_at)&&<button className="btn ghost" onClick={()=>mark()}>Mark all read</button>}</div>
+    <div className="page-top"><div><div className="eyebrow">INBOX</div><h1 className="app-title">Keep <em>moving.</em></h1><p className="sub">Offers, task updates, wallet events and useful CarryGo nudges.</p></div>{items.some(x=>!x.read_at)&&<button className="btn ghost" onClick={()=>mark()}>Mark all read</button>}</div>
     <div className="notification-list">
       {busy ? [1,2,3].map(i=><div className="notification-skeleton card" key={i}/>) :
       items.length ? items.map(n=><article key={n.id} className={n.read_at?'notification card':'notification card unread'} onClick={()=>!n.read_at&&mark(n.id)}>
