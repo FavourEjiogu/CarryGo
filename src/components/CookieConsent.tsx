@@ -14,7 +14,8 @@ export function CookieConsent({ enabled = true }: { enabled?: boolean }) {
       if (sessionStorage.getItem('cg:cookie-banner-seen:v1') === '1') return;
       sessionStorage.setItem('cg:cookie-banner-seen:v1', '1');
     } catch {}
-    setVisible(true);
+    const frame = window.requestAnimationFrame(() => setVisible(true));
+    return () => window.cancelAnimationFrame(frame);
   }, [enabled]);
 
   if (!visible) return null;
