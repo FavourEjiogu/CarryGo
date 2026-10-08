@@ -95,7 +95,7 @@ export function Tour({
 
   return createPortal(
     <div className="fixed inset-0 z-[500]">
-      <div className="absolute inset-0 bg-[rgba(11,13,12,.42)]" onClick={() => close(false)} />
+      <div className="absolute inset-0 bg-[rgba(11,13,12,.42)]" onClick={() => close(false)} aria-hidden="true" />
       {rect ? (
         <motion.div
           initial={false}
@@ -114,12 +114,15 @@ export function Tour({
         />
       ) : null}
       <motion.div
-        initial={reduce ? false : { opacity: 0, scale: 0.96 }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="carrygo-tour-title"
+        initial={reduce ? false : { opacity: 0, scale: 0.96 }
         animate={{ opacity: 1, scale: 1, left, top }}
         className="absolute w-[320px] max-w-[calc(100vw-24px)] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-2xl"
       >
         <div className="flex items-start justify-between gap-3">
-          <h3 className="font-semibold">{step.title}</h3>
+          <h3 id="carrygo-tour-title" className="font-semibold">{step.title}</h3>
           <button type="button" className="text-[var(--muted)]" onClick={() => close(false)} aria-label="Close tour">
             ×
           </button>
