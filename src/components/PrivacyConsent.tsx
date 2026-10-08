@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 import { useEffect, useState } from 'react';
 
 const CONSENT_KEY = 'cg:privacy-consent';
@@ -12,15 +13,27 @@ export function PrivacyConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     if (!publicRoutes.has(pathname)) {
       setVisible(false);
       return;
     }
-    try {
-      setVisible(localStorage.getItem(CONSENT_KEY) === null);
-    } catch {
-      setVisible(true);
-    }
+    (async () => {
+      const [{ data }] = await Promise.all([
+        getSupabaseBrowserClient().auth.getSession(),
+      ]);
+      if (cancelled || data.session) {
+        setVisible(false);
+        return;
+      }
+      try {
+        const hasChoice = localStorage.getItem(CONSENT_KEY) !== null || document.cookie.includes('cg_privacy_consent=');
+        setVisible(!hasChoice);
+      } catch {
+        setVisible(true);
+      }
+    })();
+    return () => { cancelled = true; };
   }, [pathname]);
 
   function choose(value: 'essential' | 'analytics') {
