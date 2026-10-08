@@ -27,7 +27,7 @@ export function PrivacyConsent() {
     try {
       localStorage.setItem(CONSENT_KEY, value);
     } catch {}
-    document.cookie = 'cg_privacy_consent=' + value + '; Max-Age=31536000; Path=/; SameSite=Lax';
+    document.cookie = 'cg_privacy_consent=' + value + '; Max-Age=31536000; Path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
     setVisible(false);
     window.dispatchEvent(new Event('cg:privacy-consent'));
   }
