@@ -21,6 +21,8 @@ export function PWAExperience() {
     window.addEventListener('offline', refreshNetwork);
 
     const onInstall = (event: Event) => {
+      const standalone = window.matchMedia('(display-mode: standalone)').matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
+      if (standalone) return;
       event.preventDefault();
       setInstallEvent(event as BeforeInstallPromptEvent);
       try {
