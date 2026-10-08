@@ -16,6 +16,12 @@ type Dashboard={
  tasks?:Array<{id:string;title:string;status:string;pickup_location_text:string;destination_location_text:string}>;
 };
 
+const tourSteps:TourStep[]=[
+  {target:'#tour-do',title:'Start with what you need',content:'Describe the task in your own words, then review the route before it moves.',placement:'bottom'},
+  {target:'#tour-earn',title:'Earn around campus',content:'See nearby work, compare the details and choose what fits.',placement:'bottom'},
+  {target:'#tour-how',title:'Keep the loop simple',content:'CarryGo keeps the core flow clear: post, agree, then move.',placement:'top'},
+];
+
 const steps=[
   ['01','POST','Tell CarryGo what needs doing.'],
   ['02','AGREE','Choose the runner, price and timing.'],
@@ -23,7 +29,7 @@ const steps=[
 ] as const;
 
 export default function Home(){
- const[d,setD]=useState<Dashboard|null>(null);const{seen,start}=useTour('cg:tour:v1');
+ const[d,setD]=useState<Dashboard|null>(null);const{open,setOpen,seen,start,markSeen}=useTour('cg:tour:v2');
  useEffect(()=>{if(seen())return;const t=window.setTimeout(()=>start(),900);return()=>clearTimeout(t)},[seen,start]);
  useEffect(()=>{fetch('/api/dashboard',{cache:'no-store'}).then(async r=>r.status===401?{authenticated:false}:r.ok?r.json():{authenticated:false}).then(setD).catch(()=>setD({authenticated:false}))},[]);
  const first=useMemo(()=>d?.profile?.display_name?.trim().split(/\s+/)[0]||'there',[d]);
@@ -41,6 +47,7 @@ export default function Home(){
          <Link id="tour-do" href="/do" className="btn dark energy-border">I need something <Icon name="arrow" size={17}/></Link>
          <Link id="tour-earn" href="/earn" className="btn ghost">I want to earn</Link>
        </div>
+       {!d?.authenticated&&<div className="home-trust-strip" aria-label="Why the CarryGo flow is clear"><span>See the offer</span><span>Agree before movement</span><span>Pay through CarryGo</span></div>}
        {d?.authenticated&&<div className="home-context"><span><b>{liveCount}</b> open request{liveCount===1?'':'s'}</span><span><b>{d.streak?.current_weeks||0}</b> week streak</span></div>}
      </div>
 
@@ -104,5 +111,5 @@ export default function Home(){
      </div>
      <Link className="btn dark" href="/login?mode=signup">Create account <Icon name="arrow" size={16}/></Link>
    </section>}
- </main></AppShell>
+ </main><Tour steps={tourSteps} open={open} onOpenChange={setOpen} onFinish={markSeen} onSkip={markSeen}/></AppShell>
 }
