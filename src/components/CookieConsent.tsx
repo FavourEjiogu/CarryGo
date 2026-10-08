@@ -10,6 +10,10 @@ export function CookieConsent({ enabled = true }: { enabled?: boolean }) {
 
   useEffect(() => {
     if (!enabled || getAnalyticsConsent() !== 'unset') return;
+    try {
+      if (sessionStorage.getItem('cg:cookie-banner-seen:v1') === '1') return;
+      sessionStorage.setItem('cg:cookie-banner-seen:v1', '1');
+    } catch {}
     setVisible(true);
   }, [enabled]);
 
