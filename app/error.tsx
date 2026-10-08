@@ -1,0 +1,3 @@
+'use client';
+import{useEffect}from'react';import Link from'next/link';
+export default function ErrorPage({reset}:{reset:()=>void}){useEffect(()=>{window.scrollTo({top:0,behavior:'auto'})},[]);return <main className="center shell error-page"><div className="card success narrow"><div className="pill">CARRYGO · SOMETHING WENT WRONG</div><h1 className="app-title">Let’s get you <em>moving.</em></h1><p className="lead">That screen hit an unexpected problem. Your account and funds are not changed by a page error.</p><div className="actions"><button type="button" className="btn dark" onClick={()=>reset()}>Try again →</button><Link className="btn ghost" href="/">Back home</Link></div></div></main>}

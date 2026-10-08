@@ -47,12 +47,19 @@ export default function Home(){
      <div className="home-landing-visual">
        <div className="home-visual-top"><span>GET / DONE</span><span>01—03</span></div>
        <MouseFollowingEyes className="home-eyes"/>
+       <div className="home-visual-route" aria-label="Illustrated example route"><div><small>PICKUP</small><b>Green Plaza</b></div><Icon name="arrow" size={16}/><div><small>DROP</small><b>Portfolio 214</b></div></div>
        <div className="home-visual-copy">
          <small>THE SIMPLE LOOP</small>
          <strong>Post.<br/>Agree.<br/><em>Move.</em></strong>
        </div>
        <div className="home-visual-note"><span className="brand-dot"/> Built around the way your campus actually works.</div>
      </div>
+   </section>
+
+   <section className="home-proof-strip" aria-label="Why the CarryGo flow is different">
+     <div><Icon name="map" size={17}/><span><b>Campus-aware</b><small>Known places make the route easier to describe.</small></span></div>
+     <div><Icon name="shield" size={17}/><span><b>Agree first</b><small>Fee, ETA and runner are clear before funding.</small></span></div>
+     <div><Icon name="clock" size={17}/><span><b>Stay in the loop</b><small>Status and handoff live in one place.</small></span></div>
    </section>
 
    <section className="home-action-grid" aria-label="Start with CarryGo">
