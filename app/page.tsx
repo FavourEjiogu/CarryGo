@@ -16,6 +16,12 @@ type Dashboard={
  tasks?:Array<{id:string;title:string;status:string;pickup_location_text:string;destination_location_text:string}>;
 };
 
+const tourSteps:TourStep[]=[
+ {target:'#tour-do',title:'Start with what you need.',content:'Describe the errand in your own words. CarryGo turns the request into a clear task before you commit.',placement:'bottom'},
+ {target:'#tour-earn',title:'Turn spare movement into value.',content:'Browse nearby work that fits your campus route and choose what makes sense to you.',placement:'bottom'},
+ {target:'#tour-how',title:'One simple loop.',content:'Post the request, agree on the important details, then follow the handoff through.',placement:'top'},
+];
+
 const steps=[
   ['01','POST','Tell CarryGo what needs doing.'],
   ['02','AGREE','Choose the runner, price and timing.'],
@@ -105,5 +111,5 @@ export default function Home(){
      </div>
      <Link className="btn dark" href="/login?mode=signup">Create account <Icon name="arrow" size={16}/></Link>
    </section>}
- </main><CookieConsent enabled={!d?.authenticated}/></AppShell>
+ <Tour steps={tourSteps} open={open} onOpenChange={setOpen} onFinish={markSeen} onSkip={markSeen}/><CookieConsent enabled={Boolean(d&&!d.authenticated)}/></main></AppShell>
 }
