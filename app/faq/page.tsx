@@ -1,0 +1,15 @@
+'use client';
+import{useState}from'react';import Link from'next/link';import{ChevronDown,HelpCircle,ShieldCheck}from'lucide-react';import{AppShell}from'@/src/components/AppShell';
+const faqs=[
+["What is CarryGo?","CarryGo is a campus execution network. You describe what needs to happen, compare sensible offers when needed, then let a verified campus runner execute it."],
+["Does CarryGo know my campus places?","Yes. Known public campus places are matched to canonical locations when confidence is high. Ambiguous names stay editable instead of being guessed."],
+["Can I use OTP instead of a magic link?","Yes. One-time code is the default email sign-in method. The email contains a code; you can also choose the one-tap link method."],
+["Do I need a password?","No. Passwords are optional. You can keep using email OTP and add a password later from Security."],
+["What does 2FA do?","2FA adds a second authenticator-app code after sign-in. You can enable or disable it from Security."],
+["How do runner offers work?","Offers show the things that matter: fee, ETA, completed tasks, verification and reliability signals. You choose what makes sense before funding."],
+["How does the free errand reward work?","The current reward system can grant free-errand credits through weekly leaderboard placement and referral milestones. Item cost and runner compensation still apply."],
+["How do referrals qualify?","A referred user qualifies their referral when they complete their first CarryGo task. Every fifth qualifying referral unlocks a free errand credit."],
+["Can I share a delivery without sharing my account?","Yes. Share live status creates a temporary delivery-only link. It expires automatically and does not expose account history or location history."],
+["What happens to my location?","Location telemetry is only used while a delivery is being followed and is not exposed as a historical public trail."],
+];
+export default function FAQ(){const[open,setOpen]=useState(0);return <AppShell><main className="shell app-page narrow"><div className="page-top"><div><div className="eyebrow">HELP</div><h1 className="app-title">Questions, <em>without the clutter.</em></h1><p className="sub">CarryGo should hide complexity, not create more of it.</p></div></div><section className="card faq-list">{faqs.map(([q,a],i)=><div className={open===i?'faq-item open':'faq-item'} key={q}><button type="button" onClick={()=>setOpen(open===i?-1:i)} aria-expanded={open===i}><span>{q}</span><ChevronDown/></button>{open===i&&<p>{a}</p>}</div>)}</section><div className="card form faq-security"><div className="faq-icon"><ShieldCheck/></div><h2>Your security is part of the product.</h2><p className="sub">CarryGo uses server-side validation, campus-scoped access rules, explicit funding, private handoff codes and optional authenticator-based 2FA.</p><div className="actions"><Link className="btn dark" href="/security">Open Security</Link><Link className="btn ghost" href="/privacy">Read Privacy</Link></div></div><div className="soft-note"><HelpCircle size={14}/>Still stuck? Contact the team through the support details in the app.</div></main></AppShell>}

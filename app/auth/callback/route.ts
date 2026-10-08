@@ -32,6 +32,8 @@ export async function GET(req: Request) {
   const{data:{user}}=await supabase.auth.getUser();
   if(!user)return NextResponse.redirect(new URL('/login?error=auth_failed',origin));
   const{data:profile}=await supabase.from('users').select('display_name,phone_number,campus_id').eq('id',user.id).maybeSingle();
-  const needsOnboarding=!profile?.phone_number||!profile?.campus_id||flow==='signup';
-  return NextResponse.redirect(new URL(needsOnboarding?'/onboarding':'/',origin));
+  if(!profile?.phone_number||!profile?.campus_id||flow==='signup') return NextResponse.redirect(new URL('/onboarding',origin));
+  const{data:aal}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if(aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2') return NextResponse.redirect(new URL('/mfa?next=/',origin));
+  return NextResponse.redirect(new URL('/',origin));
 }
