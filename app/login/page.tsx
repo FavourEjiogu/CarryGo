@@ -10,6 +10,7 @@ import { MouseFollowingEyes } from '@/components/ui/mouse-following-eyes';
 import { OtpInput } from '@/components/ui/otp-input';
 import { track } from '@/src/lib/analytics';
 import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
+import { CookieConsent } from '@/src/components/CookieConsent';
 
 type Mode='signin'|'signup';
 type Method='otp'|'link'|'password';
@@ -65,7 +66,7 @@ export default function Login(){
  async function submit(e:FormEvent){e.preventDefault();if(sent&&method==='otp'){await verifyCode();return}await sendVerification()}
  const eyesClosed=passwordFocus||password.length>0;
 
- return <main className="auth-page">
+ return <><main className="auth-page">
   <div className="auth-orbit auth-orbit-one" aria-hidden="true"/><div className="auth-orbit auth-orbit-two" aria-hidden="true"/>
   <div className="auth-layout">
    <aside className="auth-brand-panel"><Link className="brand auth-brand" href="/"><i className="brand-dot"/>CarryGo</Link><div className="auth-brand-copy"><span className="auth-kicker">CAMPUS EXECUTION</span><h2>Campus errands, <em>without the back-and-forth.</em></h2><p>Tell us what you need. We turn the messy parts into something simple.</p></div><div className="auth-feature-stack"><div><Icon name="bolt" size={17}/><span>Negotiate price + time</span></div><div><Icon name="location" size={17}/><span>Follow the job as it moves</span></div><div><Icon name="shield" size={17}/><span>Protect wallet + handoff</span></div></div><span className="auth-footnote">Built for the way students actually move.</span></aside>
@@ -84,5 +85,5 @@ export default function Login(){
     <p className="auth-legal">By continuing, you agree to use CarryGo responsibly and follow the delivery rules shown in the app.</p>
    </MotionPage>
   </div>
- </main>
+ </main><CookieConsent /></>
 }

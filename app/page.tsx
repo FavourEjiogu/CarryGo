@@ -5,7 +5,7 @@ import Link from'next/link';
 import{motion}from'motion/react';
 import{AppShell}from'@/src/components/AppShell';
 import{Icon}from'@/src/components/icons';
-import{MouseFollowingEyes}from'@/components/ui/mouse-following-eyes';import{Tour,useTour,type TourStep}from'@/components/ui/product-tour';
+import{MouseFollowingEyes}from'@/components/ui/mouse-following-eyes';import{Tour,useTour,type TourStep}from'@/components/ui/product-tour';import{CookieConsent}from'@/src/components/CookieConsent';
 
 type Dashboard={
  authenticated:boolean;
@@ -16,6 +16,12 @@ type Dashboard={
  tasks?:Array<{id:string;title:string;status:string;pickup_location_text:string;destination_location_text:string}>;
 };
 
+const tourSteps:TourStep[]=[
+ {target:'#tour-do',title:'Start with what you need.',content:'Describe the errand in your own words. CarryGo turns the request into a clear task before you commit.',placement:'bottom'},
+ {target:'#tour-earn',title:'Turn spare movement into value.',content:'Browse nearby work that fits your campus route and choose what makes sense to you.',placement:'bottom'},
+ {target:'#tour-how',title:'One simple loop.',content:'Post the request, agree on the important details, then follow the handoff through.',placement:'top'},
+];
+
 const steps=[
   ['01','POST','Tell CarryGo what needs doing.'],
   ['02','AGREE','Choose the runner, price and timing.'],
@@ -23,7 +29,7 @@ const steps=[
 ] as const;
 
 export default function Home(){
- const[d,setD]=useState<Dashboard|null>(null);const{seen,start}=useTour('cg:tour:v1');
+ const[d,setD]=useState<Dashboard|null>(null);const{open,setOpen,start,seen,markSeen}=useTour('cg:tour:v1');
  useEffect(()=>{if(seen())return;const t=window.setTimeout(()=>start(),900);return()=>clearTimeout(t)},[seen,start]);
  useEffect(()=>{fetch('/api/dashboard',{cache:'no-store'}).then(async r=>r.status===401?{authenticated:false}:r.ok?r.json():{authenticated:false}).then(setD).catch(()=>setD({authenticated:false}))},[]);
  const first=useMemo(()=>d?.profile?.display_name?.trim().split(/\s+/)[0]||'there',[d]);
@@ -41,6 +47,8 @@ export default function Home(){
          <Link id="tour-do" href="/do" className="btn dark energy-border">I need something <Icon name="arrow" size={17}/></Link>
          <Link id="tour-earn" href="/earn" className="btn ghost">I want to earn</Link>
        </div>
+       <div className="home-trust-row" aria-label="CarryGo promises"><span>Campus-first</span><span>Agree before the move</span><span>Handoff protected</span></div>
+       <div className="home-task-types" aria-label="Common campus tasks"><span>Food</span><span>Groceries</span><span>Documents</span><span>Parcels</span><span>Quick errands</span></div>
        {d?.authenticated&&<div className="home-context"><span><b>{liveCount}</b> open request{liveCount===1?'':'s'}</span><span><b>{d.streak?.current_weeks||0}</b> week streak</span></div>}
      </div>
 
@@ -59,13 +67,13 @@ export default function Home(){
      <Link href="/do" className="home-action-card home-action-primary energy-border">
        <div><span className="action-index">01</span><Icon name="arrow" size={18}/></div>
        <small>I NEED SOMETHING</small>
-       <h2>Post a task.</h2>
+       <h2>Post a <em>task.</em></h2>
        <p>Describe it in your own words. Agree on the details before anything moves.</p>
      </Link>
      <Link href="/earn" className="home-action-card">
        <div><span className="action-index">02</span><Icon name="arrow" size={18}/></div>
        <small>I WANT TO EARN</small>
-       <h2>Take a task.</h2>
+       <h2>Take a <em>task.</em></h2>
        <p>See what people around your campus need and choose work that fits you.</p>
      </Link>
    </section>
@@ -104,5 +112,5 @@ export default function Home(){
      </div>
      <Link className="btn dark" href="/login?mode=signup">Create account <Icon name="arrow" size={16}/></Link>
    </section>}
- </main></AppShell>
+ <Tour steps={tourSteps} open={open} onOpenChange={setOpen} onFinish={markSeen} onSkip={markSeen}/><CookieConsent enabled={Boolean(d&&!d.authenticated)}/></main></AppShell>
 }

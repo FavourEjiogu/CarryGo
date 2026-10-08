@@ -85,7 +85,7 @@ export default function DoPage(){
  }
  if(!ready)return <AppShell><main className="shell app-page narrow"><div className="card form"><h2>Sign in to use CarryGo.</h2><p className="sub">Your wallet, streaks and task history live on your account.</p><Link className="btn dark" href="/login">Sign in →</Link></div></main></AppShell>;
  return <AppShell><main className="shell app-page narrow">
-  <div className="page-top"><div><div className="eyebrow">NEW TASK</div><h1 className="app-title">Tell us what needs doing.</h1><p className="sub">Say it normally. CarryGo will pull out the details that matter.</p></div></div>
+  <div className="page-top"><div><div className="eyebrow">NEW TASK</div><h1 className="app-title">Tell us what needs <em>doing.</em></h1><p className="sub">Say it normally. CarryGo will pull out the details that matter.</p></div></div>
   {late&&<div className="late-banner"><strong>Hostel delivery only right now.</strong><span>From 10 PM to 5 AM, new jobs must end at a hostel or room.</span></div>}
   <div className="template-row">{templates.map(([a,b,c])=><button type="button" key={a} className={template===a?'mini-choice active':'mini-choice'} onClick={()=>chooseTemplate(a,c)}><small>{a}</small><span>{b}</span></button>)}</div>
   <div className="card form task-form">
