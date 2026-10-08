@@ -4,12 +4,13 @@ import { useEffect } from 'react';
 import posthog from 'posthog-js';
 
 const CONSENT_KEY = 'cg:privacy-consent';
+let initialised = false;
 
 function initialise() {
   if (typeof window === 'undefined') return;
   if (window.navigator.doNotTrack === '1') return;
   if (window.localStorage.getItem(CONSENT_KEY) !== 'analytics') return;
-  if (posthog.__loaded) return;
+  if (initialised) return;
 
   const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
   const host = process.env.NEXT_PUBLIC_POSTHOG_HOST;
@@ -25,6 +26,7 @@ function initialise() {
     persistence: 'memory',
     respect_dnt: true,
   });
+  initialised = true;
 }
 
 export function AnalyticsBootstrap() {
