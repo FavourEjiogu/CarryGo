@@ -5,7 +5,7 @@ import Link from'next/link';
 import{motion}from'motion/react';
 import{AppShell}from'@/src/components/AppShell';
 import{Icon}from'@/src/components/icons';
-import{MouseFollowingEyes}from'@/components/ui/mouse-following-eyes';
+import{MouseFollowingEyes}from'@/components/ui/mouse-following-eyes';import{Tour,useTour,type TourStep}from'@/components/ui/product-tour';
 
 type Dashboard={
  authenticated:boolean;
@@ -23,7 +23,8 @@ const steps=[
 ] as const;
 
 export default function Home(){
- const[d,setD]=useState<Dashboard|null>(null);
+ const[d,setD]=useState<Dashboard|null>(null);const tour=useTour('cg:tour:v1');
+ useEffect(()=>{if(!tour.seen()){const t=window.setTimeout(()=>tour.start(),900);return()=>clearTimeout(t)}},[tour]);
  useEffect(()=>{fetch('/api/dashboard',{cache:'no-store'}).then(async r=>r.status===401?{authenticated:false}:r.ok?r.json():{authenticated:false}).then(setD).catch(()=>setD({authenticated:false}))},[]);
  const first=useMemo(()=>d?.profile?.display_name?.trim().split(/\s+/)[0]||'there',[d]);
  const campusLabel=d?.campus?.name?(d.campus.city?d.campus.name+' · '+d.campus.city:d.campus.name):'Your campus';
@@ -37,8 +38,8 @@ export default function Home(){
        <h1>{d?.authenticated?<>Good to see you, <em>{first}.</em></>:<>Get things done.<br/><em>Keep moving.</em></>}</h1>
        <p className="home-lead">Need something picked up, bought, delivered or handled nearby? Post it here. A runner takes it from there.</p>
        <div className="home-cta">
-         <Link href="/do" className="btn dark">I need something <Icon name="arrow" size={17}/></Link>
-         <Link href="/earn" className="btn ghost">I want to earn</Link>
+         <Link id="tour-do" href="/do" className="btn dark energy-border">I need something <Icon name="arrow" size={17}/></Link>
+         <Link id="tour-earn" href="/earn" className="btn ghost">I want to earn</Link>
        </div>
        {d?.authenticated&&<div className="home-context"><span><b>{liveCount}</b> open request{liveCount===1?'':'s'}</span><span><b>{d.streak?.current_weeks||0}</b> week streak</span></div>}
      </div>
@@ -55,7 +56,7 @@ export default function Home(){
    </section>
 
    <section className="home-action-grid" aria-label="Start with CarryGo">
-     <Link href="/do" className="home-action-card home-action-primary">
+     <Link href="/do" className="home-action-card home-action-primary energy-border">
        <div><span className="action-index">01</span><Icon name="arrow" size={18}/></div>
        <small>I NEED SOMETHING</small>
        <h2>Post a task.</h2>
@@ -69,7 +70,7 @@ export default function Home(){
      </Link>
    </section>
 
-   <section className="home-process" aria-label="How CarryGo works">
+   <section className="home-process" id="tour-how"> aria-label="How CarryGo works">
      <div className="section-label"><span>HOW IT WORKS</span><span>THREE MOVES</span></div>
      <div className="home-process-grid">
        {steps.map(([n,k,copy])=><motion.article key={n} className="home-process-step" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:.25,delay:Number(n)*.04}}>
@@ -95,7 +96,7 @@ export default function Home(){
 
    {d?.tasks?.length? <section className="section-tight"><div className="section-label"><span>YOUR CURRENT TASKS</span><Link href="/orders">View all</Link></div><div className="task-list compact">{d.tasks.map(t=><Link href={'/orders/'+t.id} className="task-row" key={t.id}><div><b>{t.title}</b><span>{t.pickup_location_text} → {t.destination_location_text}</span></div><strong>{t.status.replaceAll('_',' ')}</strong></Link>)}</div></section>:null}
 
-   {!d?.authenticated&&<section className="home-reassurance">
+   {!d?.authenticated&&<section className="home-reassurance energy-border">
      <div>
        <small>NEW HERE?</small>
        <h2>Start with your campus.</h2>
