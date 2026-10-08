@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react';
 
-export type IconName='home'|'plus'|'bolt'|'orders'|'user'|'wallet'|'bell'|'arrow'|'check'|'map'|'shield'|'chevron'|'logout'|'mail'|'clock'|'location'|'search'|'wifi'|'swap';
+export type IconName='home'|'plus'|'bolt'|'orders'|'user'|'wallet'|'bell'|'arrow'|'check'|'map'|'shield'|'chevron'|'logout'|'mail'|'clock'|'location'|'search'|'wifi'|'swap'|'info'|'x'|'download';
 
 const paths:Record<IconName,React.ReactNode>={
   home:<><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/><path d="M9 21v-6h6v6"/></>,
@@ -11,7 +11,7 @@ const paths:Record<IconName,React.ReactNode>={
   wallet:<><path d="M4 7.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7.5Z"/><path d="M4 8V6.5A2.5 2.5 0 0 1 6.5 4H19"/><path d="M16 13h4"/></>,
   bell:<><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></>,
   arrow:<><path d="M5 12h13"/><path d="m13 6 6 6-6 6"/></>,
-  check:<><path d="m5 12 4 4L19 6"/></>,
+  check:<path d="m5 12 4 4L19 6"/>,
   map:<><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20V6.5Z"/><path d="M9 4v13.5M15 6.5V20"/></>,
   shield:<><path d="M12 3 19 6v5c0 4.6-2.9 7.1-7 9-4.1-1.9-7-4.4-7-9V6l7-3Z"/><path d="m9 12 2 2 4-4"/></>,
   chevron:<path d="m8 10 4 4 4-4"/>,
@@ -22,6 +22,9 @@ const paths:Record<IconName,React.ReactNode>={
   search:<><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></>,
   wifi:<><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8 15.5a6.5 6.5 0 0 1 8 0"/><path d="M11 18.5a2 2 0 0 1 2 0"/><path d="M3 9a14 14 0 0 1 18 0"/></>,
   swap:<><path d="m7 7 3-3 3 3"/><path d="M10 4v12"/><path d="m17 17-3 3-3-3"/><path d="M14 20V8"/></>,
+  info:<><circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7.5v.5"/></>,
+  x:<><path d="m6 6 12 12M18 6 6 18"/></>,
+  download:<><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></>,
 };
 
 export function Icon({name,size=18,strokeWidth=1.8,className}:{
