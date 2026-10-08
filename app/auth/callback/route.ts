@@ -1,19 +1,11 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createSupabaseServerClient } from '@/src/lib/supabase/server';
-
-function canonicalOrigin(req: Request) {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (!configured) return new URL(req.url).origin;
-  const parsed = new URL(configured);
-  if (process.env.NODE_ENV === 'production' && parsed.protocol !== 'https:') throw new Error('NEXT_PUBLIC_SITE_URL must use HTTPS in production');
-  return parsed.origin;
-}
+import { getSiteOrigin } from '@/src/lib/site-origin';
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  let origin: string;
-  try { origin = canonicalOrigin(req); } catch { return NextResponse.redirect(new URL('/login?error=auth_config', url.origin)); }
+  const origin = getSiteOrigin(url.origin);
   const code = url.searchParams.get('code');
   const flow = url.searchParams.get('flow') === 'signup' ? 'signup' : 'signin';
   const rememberMe = url.searchParams.get('remember') === '1';
