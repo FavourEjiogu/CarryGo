@@ -7,11 +7,11 @@ interface EyeProps {
   mouseX: number;
   mouseY: number;
   selfRef: React.RefObject<HTMLDivElement | null>;
-  otherRef: React.RefObject<HTMLDivElement | null>;
   closed: boolean;
+  reduceMotion: boolean;
 }
 
-function Eye({ mouseX, mouseY, selfRef, otherRef, closed }: EyeProps) {
+function Eye({ mouseX, mouseY, selfRef, closed, reduceMotion }: EyeProps) {
   const pupilRef = useRef<HTMLDivElement>(null);
   const [center, setCenter] = useState({ x: 0, y: 0 });
 
@@ -29,30 +29,23 @@ function Eye({ mouseX, mouseY, selfRef, otherRef, closed }: EyeProps) {
   }, [updateCenter]);
 
   useEffect(() => {
-    if (closed || !pupilRef.current) return;
+    const pupil = pupilRef.current;
+    if (!pupil) return;
 
-    const containsPointer = (ref: React.RefObject<HTMLDivElement | null>) => {
-      const rect = ref.current?.getBoundingClientRect();
-      return Boolean(
-        rect &&
-          mouseX >= rect.left &&
-          mouseX <= rect.right &&
-          mouseY >= rect.top &&
-          mouseY <= rect.bottom,
-      );
-    };
-
-    if (containsPointer(selfRef) || containsPointer(otherRef)) return;
+    if (closed || reduceMotion) {
+      pupil.style.transform = "translate(0px, 0px)";
+      return;
+    }
 
     const angle = Math.atan2(mouseY - center.y, mouseX - center.x);
     const maxMove = 20;
-    pupilRef.current.style.transform =
+    pupil.style.transform =
       "translate(" +
       Math.cos(angle) * maxMove +
       "px," +
       Math.sin(angle) * maxMove +
       "px)";
-  }, [closed, mouseX, mouseY, center, selfRef, otherRef]);
+  }, [center, closed, mouseX, mouseY, reduceMotion]);
 
   return (
     <div
@@ -84,32 +77,45 @@ export function MouseFollowingEyes({
   closed = false,
 }: MouseFollowingEyesProps) {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [reduceMotion, setReduceMotion] = useState(false);
   const eye1Ref = useRef<HTMLDivElement>(null);
   const eye2Ref = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncMotionPreference = () => setReduceMotion(media.matches);
+    syncMotionPreference();
+    media.addEventListener("change", syncMotionPreference);
+    return () => media.removeEventListener("change", syncMotionPreference);
+  }, []);
+
+  useEffect(() => {
+    let frame = 0;
+    let scheduled = false;
+    let next = { x: 0, y: 0 };
+
+    const onMouseMove = (event: MouseEvent) => {
+      next = { x: event.clientX, y: event.clientY };
+      if (scheduled) return;
+      scheduled = true;
+      frame = window.requestAnimationFrame(() => {
+        scheduled = false;
+        setMousePos(next);
+      });
+    };
+
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
   return (
-    <div
-      className={"desktop-eyes-only flex items-center justify-center rounded-xl " + className}
-      onMouseMove={(event) =>
-        setMousePos({ x: event.clientX, y: event.clientY })
-      }
-      aria-hidden="true"
-    >
+    <div className={"desktop-eyes-only flex items-center justify-center " + className} aria-hidden="true">
       <div className="flex -space-x-2">
-        <Eye
-          mouseX={mousePos.x}
-          mouseY={mousePos.y}
-          selfRef={eye1Ref}
-          otherRef={eye2Ref}
-          closed={closed}
-        />
-        <Eye
-          mouseX={mousePos.x}
-          mouseY={mousePos.y}
-          selfRef={eye2Ref}
-          otherRef={eye1Ref}
-          closed={closed}
-        />
+        <Eye mouseX={mousePos.x} mouseY={mousePos.y} selfRef={eye1Ref} closed={closed} reduceMotion={reduceMotion} />
+        <Eye mouseX={mousePos.x} mouseY={mousePos.y} selfRef={eye2Ref} closed={closed} reduceMotion={reduceMotion} />
       </div>
     </div>
   );
