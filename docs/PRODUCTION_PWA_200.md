@@ -43,7 +43,7 @@ This checklist is the release inventory for a production campus marketplace/PWA.
 
 ## Typography
 
-31. ✅ Earlier system-font feel is restored
+31. ✅ Manrope body + Space Grotesk display pairing is restored
 32. ✅ Body uses readable system sans
 33. ✅ Headings use the same family as body
 34. ✅ Headings use strong weight
