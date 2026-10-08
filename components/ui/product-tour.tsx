@@ -52,9 +52,20 @@ export function Tour({
   }, [open, index, step]);
 
   React.useEffect(() => {
-    if (open) document.body.style.overflow = "hidden";
+    if (!open) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close(false);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    document.body.style.overflow = "hidden";
     return () => {
+      document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "";
+      previous?.focus();
     };
   }, [open]);
 
@@ -94,7 +105,7 @@ export function Tour({
   top = Math.max(12, Math.min(top, window.innerHeight - h - 12));
 
   return createPortal(
-    <div className="fixed inset-0 z-[500]">
+    <div className="fixed inset-0 z-[500]" role="dialog" aria-modal="true" aria-label="CarryGo quick tour">
       <div className="absolute inset-0 bg-[rgba(11,13,12,.42)]" onClick={() => close(false)} />
       {rect ? (
         <motion.div
@@ -116,7 +127,7 @@ export function Tour({
       <motion.div
         initial={reduce ? false : { opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1, left, top }}
-        className="absolute w-[320px] max-w-[calc(100vw-24px)] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-2xl"
+        role="document" tabIndex={-1} className="absolute w-[320px] max-w-[calc(100vw-24px)] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-2xl"
       >
         <div className="flex items-start justify-between gap-3">
           <h3 className="font-semibold">{step.title}</h3>
@@ -126,14 +137,14 @@ export function Tour({
         </div>
         <div className="mt-2 text-sm text-[var(--muted)]">{step.content}</div>
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-[9px] font-bold text-[var(--muted)]">
+          <span className="min-h-11 flex items-center text-[9px] font-bold text-[var(--muted)]">
             {index + 1} / {steps.length}
           </span>
           <div className="flex gap-2">
-            <button type="button" className="btn ghost" onClick={() => (index ? setIndex(index - 1) : close(false))}>
+            <button type="button" className="btn ghost min-h-11" onClick={() => (index ? setIndex(index - 1) : close(false))}>
               {index ? "Back" : "Skip"}
             </button>
-            <button type="button" className="btn dark" onClick={() => (index === steps.length - 1 ? close(true) : setIndex(index + 1))}>
+            <button type="button" className="btn dark min-h-11" onClick={() => (index === steps.length - 1 ? close(true) : setIndex(index + 1))}>
               {index === steps.length - 1 ? "Done" : "Next"} →
             </button>
           </div>
