@@ -117,7 +117,7 @@ export function Tour({
         role="dialog"
         aria-modal="true"
         aria-labelledby="carrygo-tour-title"
-        initial={reduce ? false : { opacity: 0, scale: 0.96 }
+        initial={reduce ? false : { opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1, left, top }}
         className="absolute w-[320px] max-w-[calc(100vw-24px)] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-2xl"
       >
