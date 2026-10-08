@@ -462,3 +462,8 @@ input[aria-invalid="true"],select[aria-invalid="true"],textarea[aria-invalid="tr
 .home-landing-copy .home-cta .btn{flex:0 0 auto}
 @media(max-width:900px){.page-pad{padding:28px 0 132px}.home-proof-strip{grid-template-columns:1fr}.home-proof-strip>div{border-right:0;border-bottom:1px solid var(--line)}.home-proof-strip>div:last-child{border-bottom:0}}
 @media(max-width:620px){.page-pad{padding-bottom:132px}.home-proof-strip>div{padding:13px 12px}.home-visual-route{margin:0 5px 11px}}
+
+.skip-link{position:fixed;left:12px;top:12px;z-index:1000;transform:translateY(-160%);padding:10px 13px;border-radius:12px;background:var(--ink);color:#fff;font-size:10px;font-weight:950;box-shadow:0 12px 30px rgba(11,13,12,.22);transition:transform .18s var(--ease)}
+.skip-link:focus{transform:translateY(0)}
+.btn:active,.mini-choice:active,.choice:active,.filter:active{transform:scale(.985);box-shadow:none}
+.route-stage:focus{outline:none}
