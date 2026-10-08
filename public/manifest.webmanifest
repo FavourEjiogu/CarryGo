@@ -1,1 +1,23 @@
-{"name":"CarryGo","short_name":"CarryGo","description":"Get things done around Bingham campus.","start_url":"/","display":"standalone","background_color":"#f3f3ed","theme_color":"#0b0d0c","icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml"}]}
+{
+  "id": "/",
+  "name": "CarryGo",
+  "short_name": "CarryGo",
+  "description": "A campus execution network for everyday tasks, pickups and deliveries.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "browser"],
+  "background_color": "#f3f3ed",
+  "theme_color": "#0b0d0c",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    {"src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ],
+  "shortcuts": [
+    {"name": "Post a task", "short_name": "Post", "url": "/do", "icons": [{"src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "Find work", "short_name": "Earn", "url": "/earn", "icons": [{"src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png"}]},
+    {"name": "My tasks", "short_name": "Orders", "url": "/orders", "icons": [{"src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png"}]}
+  ]
+}
