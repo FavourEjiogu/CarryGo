@@ -31,7 +31,7 @@ export default async function SharedStatus({params}:{params:Promise<{token:strin
  }
  return <main className="shell app-page narrow shared-status-page">
    <div className="eyebrow">CARRYGO · SHARED STATUS</div>
-   <h1 className="app-title">Delivery status</h1>
+   <h1 className="app-title">Delivery <em>status.</em></h1>
    <div className="card form">{content}<p className="soft-note">This page shows only this delivery. It does not expose your account or location history.</p></div>
  </main>;
 }
