@@ -36,7 +36,16 @@ export function PWAExperience() {
 
     const standalone = window.matchMedia('(display-mode: standalone)').matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    if (ios && !standalone) window.setTimeout(() => setIosInstall(true), 12000);
+    if (ios && !standalone) {
+      try {
+        if (sessionStorage.getItem('cg:pwa-ios-seen:v1') !== '1') {
+          sessionStorage.setItem('cg:pwa-ios-seen:v1', '1');
+          window.setTimeout(() => setIosInstall(true), 12000);
+        }
+      } catch {
+        window.setTimeout(() => setIosInstall(true), 12000);
+      }
+    }
 
     window.addEventListener('beforeinstallprompt', onInstall as EventListener);
     window.addEventListener('carrygo:sw-update', onUpdate as EventListener);
