@@ -1,6 +1,163 @@
 "use client";
-import*as React from"react";import{createPortal}from"react-dom";import{AnimatePresence,motion,useReducedMotion}from"motion/react";
-export type TourStep={target?:string;title:string;content:React.ReactNode;placement?:"top"|"bottom"|"left"|"right"|"center"};
-export type TourProps={steps:TourStep[];open:boolean;onOpenChange?:(open:boolean)=>void;onFinish?:()=>void;onSkip?:()=>void};
-export function Tour({steps,open,onOpenChange,onFinish,onSkip}:TourProps){const reduce=useReducedMotion();const[index,setIndex]=React.useState(0),[mounted,setMounted]=React.useState(false),[rect,setRect]=React.useState<DOMRect|null>(null);React.useEffect(()=>setMounted(true),[]);const step=steps[index];React.useEffect(()=>{if(!open)return;const measure=()=>{const el=step?.target?document.querySelector(step.target) as HTMLElement|null:null;setRect(el?.getBoundingClientRect()||null)};measure();window.addEventListener("resize",measure);window.addEventListener("scroll",measure,true);return()=>{window.removeEventListener("resize",measure);window.removeEventListener("scroll",measure,true)}},[open,index,step]);React.useEffect(()=>{if(open)document.body.style.overflow="hidden";return()=>{document.body.style.overflow=""}},[open]);const close=(finished=false)=>{finished?onFinish?.():onSkip?.();onOpenChange?.(false);setIndex(0)};if(!mounted||!open||!step)return null;const w=320,h=170,pad=10,gap=14;let left=window.innerWidth/2-w/2,top=window.innerHeight/2-h/2;if(rect){const place=step.placement||"bottom";if(place==="bottom"){left=rect.left+rect.width/2-w/2;top=rect.bottom+gap}else if(place==="top"){left=rect.left+rect.width/2-w/2;top=rect.top-gap-h}else if(place==="right"){left=rect.right+gap;top=rect.top+rect.height/2-h/2}else if(place==="left"){left=rect.left-gap-w;top=rect.top+rect.height/2-h/2}}left=Math.max(12,Math.min(left,window.innerWidth-w-12));top=Math.max(12,Math.min(top,window.innerHeight-h-12));return createPortal(<div className="fixed inset-0 z-[500]"><div className="absolute inset-0 bg-[rgba(11,13,12,.42)]" onClick={()=>close(false)}/>{rect&&<motion.div initial={false} animate={{left:rect.left-pad,top:rect.top-pad,width:rect.width+pad*2,height:rect.height+pad*2}} transition={reduce?{duration:0}:{type:"spring",stiffness:320,damping:32}} className="pointer-events-none absolute rounded-2xl shadow-[0_0_0_9999px_rgba(11,13,12,.42)] ring-1 ring-white/60"/>}<motion.div initial={reduce?false:{opacity:0,scale:.96}} animate={{opacity:1,scale:1,left,top}} className="absolute w-[320px] max-w-[calc(100vw-24px)] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-2xl"><div className="flex items-start justify-between gap-3"><h3 className="font-semibold">{step.title}</h3><button type="button" className="text-[var(--muted)]" onClick={()=>close(false)} aria-label="Close tour">×</button></div><div className="mt-2 text-sm text-[var(--muted)]">{step.content}</div><div className="mt-4 flex items-center justify-between"><span className="text-[9px] font-bold text-[var(--muted)]">{index+1} / {steps.length}</span><div className="flex gap-2"><button type="button" className="btn ghost" onClick={()=>index?setIndex(index-1):close(false)}>{index?"Back":"Skip"}</button><button type="button" className="btn dark" onClick={()=>index===steps.length-1?close(true):setIndex(index+1)}>{index===steps.length-1?"Done":"Next"} →</button></div></div></motion.div></div>,document.body)}
-export function useTour(key:string){const[open,setOpen]=React.useState(false);const start=React.useCallback(()=>setOpen(true),[]);const seen=React.useCallback(()=>{try{return localStorage.getItem(key)==="1"}catch{return false}},[key]);const markSeen=React.useCallback(()=>{try{localStorage.setItem(key,"1")}catch{}},[key]);return{open,setOpen,start,seen,markSeen}}
+
+import * as React from "react";
+import { createPortal } from "react-dom";
+import { motion, useReducedMotion } from "motion/react";
+
+export type TourStep = {
+  target?: string;
+  title: string;
+  content: React.ReactNode;
+  placement?: "top" | "bottom" | "left" | "right" | "center";
+};
+export type TourProps = {
+  steps: TourStep[];
+  open: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onFinish?: () => void;
+  onSkip?: () => void;
+};
+
+export function Tour({
+  steps,
+  open,
+  onOpenChange,
+  onFinish,
+  onSkip,
+}: TourProps) {
+  const reduce = useReducedMotion();
+  const [index, setIndex] = React.useState(0);
+  const [rect, setRect] = React.useState<DOMRect | null>(null);
+  const step = steps[index];
+
+  React.useEffect(() => {
+    if (!open) return;
+
+    const measure = () => {
+      const element = step?.target
+        ? (document.querySelector(step.target) as HTMLElement | null)
+        : null;
+      const nextRect = element?.getBoundingClientRect() ?? null;
+      window.requestAnimationFrame(() => setRect(nextRect));
+    };
+
+    measure();
+    window.addEventListener("resize", measure);
+    window.addEventListener("scroll", measure, true);
+
+    return () => {
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("scroll", measure, true);
+    };
+  }, [open, index, step]);
+
+  React.useEffect(() => {
+    if (open) document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  const close = (finished = false) => {
+    finished ? onFinish?.() : onSkip?.();
+    onOpenChange?.(false);
+    setIndex(0);
+  };
+
+  if (!open || !step || typeof document === "undefined") return null;
+
+  const w = 320;
+  const h = 170;
+  const pad = 10;
+  const gap = 14;
+  let left = window.innerWidth / 2 - w / 2;
+  let top = window.innerHeight / 2 - h / 2;
+
+  if (rect) {
+    const place = step.placement || "bottom";
+    if (place === "bottom") {
+      left = rect.left + rect.width / 2 - w / 2;
+      top = rect.bottom + gap;
+    } else if (place === "top") {
+      left = rect.left + rect.width / 2 - w / 2;
+      top = rect.top - gap - h;
+    } else if (place === "right") {
+      left = rect.right + gap;
+      top = rect.top + rect.height / 2 - h / 2;
+    } else if (place === "left") {
+      left = rect.left - gap - w;
+      top = rect.top + rect.height / 2 - h / 2;
+    }
+  }
+
+  left = Math.max(12, Math.min(left, window.innerWidth - w - 12));
+  top = Math.max(12, Math.min(top, window.innerHeight - h - 12));
+
+  return createPortal(
+    <div className="fixed inset-0 z-[500]">
+      <div className="absolute inset-0 bg-[rgba(11,13,12,.42)]" onClick={() => close(false)} />
+      {rect ? (
+        <motion.div
+          initial={false}
+          animate={{
+            left: rect.left - pad,
+            top: rect.top - pad,
+            width: rect.width + pad * 2,
+            height: rect.height + pad * 2,
+          }}
+          transition={
+            reduce
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 320, damping: 32 }
+          }
+          className="pointer-events-none absolute rounded-2xl shadow-[0_0_0_9999px_rgba(11,13,12,.42)] ring-1 ring-white/60"
+        />
+      ) : null}
+      <motion.div
+        initial={reduce ? false : { opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1, left, top }}
+        className="absolute w-[320px] max-w-[calc(100vw-24px)] rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-2xl"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="font-semibold">{step.title}</h3>
+          <button type="button" className="text-[var(--muted)]" onClick={() => close(false)} aria-label="Close tour">
+            ×
+          </button>
+        </div>
+        <div className="mt-2 text-sm text-[var(--muted)]">{step.content}</div>
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-[9px] font-bold text-[var(--muted)]">
+            {index + 1} / {steps.length}
+          </span>
+          <div className="flex gap-2">
+            <button type="button" className="btn ghost" onClick={() => (index ? setIndex(index - 1) : close(false))}>
+              {index ? "Back" : "Skip"}
+            </button>
+            <button type="button" className="btn dark" onClick={() => (index === steps.length - 1 ? close(true) : setIndex(index + 1))}>
+              {index === steps.length - 1 ? "Done" : "Next"} →
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </div>,
+    document.body,
+  );
+}
+
+export function useTour(key: string) {
+  const [open, setOpen] = React.useState(false);
+  const start = React.useCallback(() => setOpen(true), []);
+  const seen = React.useCallback(() => {
+    try {
+      return localStorage.getItem(key) === "1";
+    } catch {
+      return false;
+    }
+  }, [key]);
+  const markSeen = React.useCallback(() => {
+    try {
+      localStorage.setItem(key, "1");
+    } catch {}
+  }, [key]);
+  return { open, setOpen, start, seen, markSeen };
+}
