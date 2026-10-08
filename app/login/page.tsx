@@ -10,6 +10,7 @@ import { MouseFollowingEyes } from '@/components/ui/mouse-following-eyes';
 import { OtpInput } from '@/components/ui/otp-input';
 import { track } from '@/src/lib/analytics';
 import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
+import { CookieConsent } from '@/src/components/CookieConsent';
 
 type Mode='signin'|'signup';
 type Method='otp'|'link'|'password';
@@ -85,4 +86,5 @@ export default function Login(){
    </MotionPage>
   </div>
  </main>
+    <CookieConsent />
 }
