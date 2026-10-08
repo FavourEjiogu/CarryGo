@@ -23,6 +23,6 @@ export function getSiteOrigin(requestOrigin?: string) {
     }
   }
 
-  if (typeof window !== 'undefined') return window.location.origin.replace(/\\/$/, '');
+  if (typeof window !== 'undefined') return window.location.origin;
   return DEFAULT_SITE_ORIGIN;
 }
