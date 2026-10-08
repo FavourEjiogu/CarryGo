@@ -32,8 +32,10 @@ export function InstallPrompt() {
   if (!visible || !event) return null;
 
   async function install() {
-    await event.prompt();
-    await event.userChoice.catch(() => null);
+    const promptEvent = event;
+    if (!promptEvent) return;
+    await promptEvent.prompt();
+    await promptEvent.userChoice.catch(() => null);
     localStorage.setItem('cg:install-nudge:v1', '1');
     setVisible(false);
     setEvent(null);
