@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseTaskRoute } from './task-parser.ts';
+import { parseTaskRoute } from './task-parser';
 
 test('extracts natural-language pickup and destination', () => {
   assert.deepEqual(
@@ -28,7 +28,7 @@ test('ignores ambiguous text', () => {
 });
 
 test('extracts the structured task fields', async () => {
-  const { parseTask, suggestedTaskTitle } = await import('./task-parser.ts');
+  const { parseTask, suggestedTaskTitle } = await import('./task-parser');
   const parsed = parseTask('Get 2 bottles of water from Green Plaza and bring them to Portfolio 214 by 6pm.');
   assert.equal(parsed?.item, 'water');
   assert.equal(parsed?.quantity, 2);
@@ -41,6 +41,6 @@ test('extracts the structured task fields', async () => {
 });
 
 test('recognizes delivery type from natural language', async () => {
-  const { parseTask } = await import('./task-parser.ts');
+  const { parseTask } = await import('./task-parser');
   assert.equal(parseTask('Bring my charger from Senate to room 214')?.deliveryType, 'ROOM');
 });
