@@ -68,7 +68,7 @@ Campus is required because it determines the marketplace. Academic fields should
 Never show Bingham University · Karu as a global brand statement. It belongs only in the campus-specific experience when the user's selected campus is Bingham.
 
 ## Authentication
-CarryGo uses passwordless email authentication. The sign-in screen separates Sign in and Create account, explains that no password is required, provides **Keep me signed in**, confirms when the link is sent, and recovers from expired/invalid links.
+CarryGo uses email-first authentication. OTP and magic links remain first-class; passwords are optional, and the sign-in screen explains that choice, provides **Keep me signed in**, confirms verification state, and recovers from expired/invalid links.
 
 Email redirects must use the canonical production URL, never an accidental localhost origin. Persistent sessions are opt-in by the user and explained in one sentence.
 
