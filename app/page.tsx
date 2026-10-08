@@ -70,7 +70,7 @@ export default function Home(){
      </Link>
    </section>
 
-   <section className="home-process" id="tour-how"> aria-label="How CarryGo works">
+   <section className="home-process" id="tour-how" aria-label="How CarryGo works">
      <div className="section-label"><span>HOW IT WORKS</span><span>THREE MOVES</span></div>
      <div className="home-process-grid">
        {steps.map(([n,k,copy])=><motion.article key={n} className="home-process-step" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:.25,delay:Number(n)*.04}}>
