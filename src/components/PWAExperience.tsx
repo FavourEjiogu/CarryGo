@@ -13,6 +13,7 @@ export function PWAExperience() {
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [showInstall, setShowInstall] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
+  const [iosInstall, setIosInstall] = useState(false);
 
   useEffect(() => {
     const refreshNetwork = () => setOnline(navigator.onLine);
@@ -32,6 +33,10 @@ export function PWAExperience() {
     };
 
     const onUpdate = () => setShowUpdate(true);
+
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (ios && !standalone) window.setTimeout(() => setIosInstall(true), 12000);
 
     window.addEventListener('beforeinstallprompt', onInstall as EventListener);
     window.addEventListener('carrygo:sw-update', onUpdate as EventListener);
@@ -79,6 +84,15 @@ export function PWAExperience() {
             <div className="pwa-actions">
               <button type="button" className="btn ghost" onClick={dismissInstall}>Not now</button>
               <button type="button" className="btn dark" onClick={install}>Install <Icon name="arrow" size={15}/></button>
+            </div>
+          </motion.section>
+        )}
+        {iosInstall && (
+          <motion.section initial={{ opacity: 0, y: 18, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 18 }} className="pwa-install" aria-label="Install CarryGo on iPhone or iPad">
+            <b>Add CarryGo to your Home Screen.</b>
+            <p>In Safari, tap Share, then “Add to Home Screen”. CarryGo will open like an app.</p>
+            <div className="pwa-actions">
+              <button type="button" className="btn dark" onClick={() => setIosInstall(false)}>Got it</button>
             </div>
           </motion.section>
         )}
