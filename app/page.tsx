@@ -48,6 +48,7 @@ export default function Home(){
          <Link id="tour-earn" href="/earn" className="btn ghost">I want to earn</Link>
        </div>
        <div className="home-trust-row" aria-label="CarryGo promises"><span>Campus-first</span><span>Agree before the move</span><span>Handoff protected</span></div>
+       <div className="home-task-types" aria-label="Common campus tasks"><span>Food</span><span>Groceries</span><span>Documents</span><span>Parcels</span><span>Quick errands</span></div>
        {d?.authenticated&&<div className="home-context"><span><b>{liveCount}</b> open request{liveCount===1?'':'s'}</span><span><b>{d.streak?.current_weeks||0}</b> week streak</span></div>}
      </div>
 
