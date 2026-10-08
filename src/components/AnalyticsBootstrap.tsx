@@ -35,6 +35,7 @@ function syncConsent() {
     opt_out_capturing_by_default: true,
     consent_persistence_name: 'cg:posthog-consent',
   });
+  posthog.opt_in_capturing();
   initialised = true;
 }
 
