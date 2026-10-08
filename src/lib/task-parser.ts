@@ -43,7 +43,7 @@ export function parseTaskRoute(input: string): ParsedTaskRoute | null {
     const match = text.match(pattern);
     if (!match) continue;
     const pickup = clean(match[1]);
-    const destination = clean(match[2]);
+    const destination = clean(match[2]).replace(/\s+(?:by|before|at)\s+\d{1,2}(?::\d{2})?\s*(?:am|pm)?$/i, '');
     if (!pickup || !destination || pickup.length < 2 || destination.length < 2) continue;
     if (pickup.toLowerCase() === destination.toLowerCase()) continue;
     return { pickup, destination, confidence };
