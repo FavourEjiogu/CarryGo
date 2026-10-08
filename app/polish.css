@@ -402,3 +402,5 @@ body{overflow-x:hidden}
   .btn:before{display:none}
   .loading-mark:before,.loading-mark:after,.loading-mark .brand-dot,.loading-dots i,.loader-line span{animation:none}
 }
+
+.skip-link{position:fixed;left:12px;top:12px;z-index:1000;transform:translateY(-160%);padding:10px 13px;border:1px solid var(--ink);border-radius:12px;background:var(--surface);color:var(--ink);font-size:10px;font-weight:950;box-shadow:0 12px 30px rgba(11,13,12,.14)}.skip-link:focus-visible{transform:none}
