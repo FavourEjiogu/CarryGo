@@ -10,6 +10,7 @@ import { MouseFollowingEyes } from '@/components/ui/mouse-following-eyes';
 import { OtpInput } from '@/components/ui/otp-input';
 import { track } from '@/src/lib/analytics';
 import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
+import { getSiteOrigin } from '@/src/lib/site-origin';
 
 type Mode='signin'|'signup';
 type Method='otp'|'link'|'password';
@@ -20,7 +21,7 @@ const ERROR_COPY:Record<string,string>={
  auth_config:'Sign-in is temporarily misconfigured. Try again or use the one-time code.',
 };
 
-const siteOrigin=()=>window.location.origin.replace(/\/$/,'');
+const siteOrigin=()=>getSiteOrigin(window.location.origin);
 const safeNext=(value:string|null)=>value&&value.startsWith('/')&&!value.startsWith('//')?value:'/';
 
 export default function Login(){
@@ -47,8 +48,7 @@ export default function Login(){
     try{localStorage.setItem('cg:remember-me',remember?'1':'0')}catch{}await goAfterAuth();return;
    }
    const supabase=getSupabaseBrowserClient(remember);
-   const options:any={shouldCreateUser:mode==='signup',data:mode==='signup'?{display_name:name.trim(),carrygo_auth_method:method}: {carrygo_auth_method:method}};
-   if(method==='link')options.emailRedirectTo=siteOrigin()+'/auth/callback?flow='+mode+'&method=link&remember='+(remember?'1':'0');
+   const options={shouldCreateUser:mode==='signup',data:mode==='signup'?{display_name:name.trim(),carrygo_auth_method:method}:{carrygo_auth_method:method},...(method==='link'?{emailRedirectTo:siteOrigin()+'/auth/callback?flow='+mode+'&method=link&remember='+(remember?'1':'0')}:{})};
    const{error:e}=await supabase.auth.signInWithOtp({email:email.trim().toLowerCase(),options});if(e){setError(e.message);return}
    try{localStorage.setItem('cg:remember-me',remember?'1':'0');if(mode==='signup')localStorage.setItem('cg:pending-signup',JSON.stringify({name:name.trim(),email:email.trim().toLowerCase()}))}catch{}
    track('auth verification requested',{mode,method,keep_signed_in:remember});
