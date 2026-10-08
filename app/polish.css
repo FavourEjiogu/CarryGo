@@ -417,3 +417,6 @@ h1 em,h2 em,h3 em,h4 em,h5 em,h6 em,.app-title em{font-style:normal;color:var(--
 @media(prefers-reduced-motion:reduce){
   .loading-mark:before,.loading-mark:after{animation:none}
 }
+
+.privacy-controls{display:grid;gap:12px;margin-top:14px;padding:16px}
+.privacy-controls>div:first-child{display:grid;gap:4px}.privacy-controls small{font-size:8px;letter-spacing:.14em;font-weight:950;color:var(--muted)}.privacy-controls h2{margin:2px 0;font-size:21px;letter-spacing:-.045em}.privacy-controls .sub{margin:0;max-width:700px}.privacy-controls-state{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:10px 12px;border-radius:11px;background:var(--paper);font-size:9px}.privacy-controls-state strong{font-size:10px}.privacy-controls .actions{margin-top:0}
