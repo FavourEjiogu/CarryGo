@@ -30,6 +30,12 @@ export function Tour({
   const [rect, setRect] = React.useState<DOMRect | null>(null);
   const step = steps[index];
 
+  const close = React.useCallback((finished = false) => {
+    finished ? onFinish?.() : onSkip?.();
+    onOpenChange?.(false);
+    setIndex(0);
+  }, [onFinish, onOpenChange, onSkip]);
+
   React.useEffect(() => {
     if (!open) return;
 
@@ -59,21 +65,26 @@ export function Tour({
         event.preventDefault();
         close(false);
       }
+      if (event.key !== "Tab") return;
+      const dialog = document.querySelector<HTMLElement>('[role="dialog"][aria-label="CarryGo quick tour"]');
+      if (!dialog) return;
+      const focusable = Array.from(dialog.querySelectorAll<HTMLElement>('button,[href],[tabindex]:not([tabindex="-1"])')).filter((el) => !el.hasAttribute("disabled"));
+      if (focusable.length < 2) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     };
     document.addEventListener("keydown", onKeyDown);
     document.body.style.overflow = "hidden";
+    const focusTimer = window.setTimeout(() => document.querySelector<HTMLElement>('[role="dialog"][aria-label="CarryGo quick tour"] button')?.focus(), 0);
     return () => {
+      window.clearTimeout(focusTimer);
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "";
       previous?.focus();
     };
-  }, [open]);
-
-  const close = (finished = false) => {
-    finished ? onFinish?.() : onSkip?.();
-    onOpenChange?.(false);
-    setIndex(0);
-  };
+  }, [close, open]);
 
   if (!open || !step || typeof document === "undefined") return null;
 
