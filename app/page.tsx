@@ -5,7 +5,7 @@ import Link from'next/link';
 import{motion}from'motion/react';
 import{AppShell}from'@/src/components/AppShell';
 import{Icon}from'@/src/components/icons';
-import{MouseFollowingEyes}from'@/components/ui/mouse-following-eyes';import{Tour,useTour,type TourStep}from'@/components/ui/product-tour';
+import{MouseFollowingEyes}from'@/components/ui/mouse-following-eyes';import{Tour,useTour,type TourStep}from'@/components/ui/product-tour';import{CookieConsent}from'@/src/components/CookieConsent';
 
 type Dashboard={
  authenticated:boolean;
@@ -41,6 +41,7 @@ export default function Home(){
          <Link id="tour-do" href="/do" className="btn dark energy-border">I need something <Icon name="arrow" size={17}/></Link>
          <Link id="tour-earn" href="/earn" className="btn ghost">I want to earn</Link>
        </div>
+       <div className="home-trust-row" aria-label="CarryGo promises"><span>Campus-first</span><span>Agree before the move</span><span>Handoff protected</span></div>
        {d?.authenticated&&<div className="home-context"><span><b>{liveCount}</b> open request{liveCount===1?'':'s'}</span><span><b>{d.streak?.current_weeks||0}</b> week streak</span></div>}
      </div>
 
@@ -59,13 +60,13 @@ export default function Home(){
      <Link href="/do" className="home-action-card home-action-primary energy-border">
        <div><span className="action-index">01</span><Icon name="arrow" size={18}/></div>
        <small>I NEED SOMETHING</small>
-       <h2>Post a task.</h2>
+       <h2>Post a <em>task.</em></h2>
        <p>Describe it in your own words. Agree on the details before anything moves.</p>
      </Link>
      <Link href="/earn" className="home-action-card">
        <div><span className="action-index">02</span><Icon name="arrow" size={18}/></div>
        <small>I WANT TO EARN</small>
-       <h2>Take a task.</h2>
+       <h2>Take a <em>task.</em></h2>
        <p>See what people around your campus need and choose work that fits you.</p>
      </Link>
    </section>
@@ -104,5 +105,5 @@ export default function Home(){
      </div>
      <Link className="btn dark" href="/login?mode=signup">Create account <Icon name="arrow" size={16}/></Link>
    </section>}
- </main></AppShell>
+ </main><CookieConsent enabled={!d?.authenticated}/></AppShell>
 }
