@@ -20,7 +20,7 @@ const ERROR_COPY:Record<string,string>={
  auth_config:'Sign-in is temporarily misconfigured. Try again or use the one-time code.',
 };
 
-const siteOrigin=()=> (process.env.NEXT_PUBLIC_SITE_URL||window.location.origin).replace(/\/$/,'');
+const siteOrigin=()=>window.location.origin.replace(/\/$/,'');
 const safeNext=(value:string|null)=>value&&value.startsWith('/')&&!value.startsWith('//')?value:'/';
 
 export default function Login(){
@@ -29,11 +29,11 @@ export default function Login(){
  const[name,setName]=useState(''),[email,setEmail]=useState(''),[code,setCode]=useState(''),[password,setPassword]=useState('');
  const[remember,setRemember]=useState(true),[sent,setSent]=useState(false),[seconds,setSeconds]=useState(0),[busy,setBusy]=useState(false),[error,setError]=useState(''),[passwordFocus,setPasswordFocus]=useState(false);
 
- useEffect(()=>{try{setRemember(localStorage.getItem('cg:remember-me')!=='0')}catch{}const p=new URLSearchParams(location.search);const m=p.get('mode');if(m==='signin'||m==='signup')setMode(m);const mt=p.get('method');if(mt==='otp'||mt==='link'||mt==='password')setMethod(mt);const e=p.get('error');if(e)setError(ERROR_COPY[e]||'Something went wrong. Try again.')},[]);
+ useEffect(()=>{const timer=window.setTimeout(()=>{try{setRemember(localStorage.getItem('cg:remember-me')!=='0')}catch{}const p=new URLSearchParams(window.location.search);const m=p.get('mode');if(m==='signin'||m==='signup')setMode(m);const mt=p.get('method');if(mt==='otp'||mt==='link'||mt==='password')setMethod(mt);const e=p.get('error');if(e)setError(ERROR_COPY[e]||'Something went wrong. Try again.')},0);return()=>window.clearTimeout(timer)},[]);
  useEffect(()=>{if(!seconds)return;const t=window.setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(t)},[seconds]);
 
  const title=useMemo(()=>mode==='signup'?<>A better way to <em>get things done.</em></>:<>Welcome <em>back.</em></>,[mode]);
- const goAfterAuth=async()=>{const supabase=getSupabaseBrowserClient(remember);const{data:aal}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();const next=safeNext(new URLSearchParams(location.search).get('next'));if(aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2'){router.replace('/mfa?next='+encodeURIComponent(next));return}const r=await fetch('/api/me',{cache:'no-store'}),j=await r.json().catch(()=>({}));if(!r.ok||!j.profile)throw new Error('Your session was created, but your account could not be loaded. Try again.');try{localStorage.removeItem('cg:pending-signup')}catch{}router.replace(j.profile.display_name&&j.profile.phone_number&&j.profile.campus_id?next:'/onboarding')};
+ const goAfterAuth=async()=>{const supabase=getSupabaseBrowserClient(remember);const{data:aal}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();const next=safeNext(new URLSearchParams(location.search).get('next'));if(aal?.nextLevel==='aal2'&&aal?.currentLevel!=='aal2'){router.replace('/mfa?next='+encodeURIComponent(next));return}const r=await fetch('/api/me',{cache:'no-store'}),j=await r.json().catch(()=>({}));if(!r.ok||!j.profile)throw new Error('Your session was created, but your account could not be loaded. Try again.');try{localStorage.removeItem('cg:pending-signup')}catch{}router.replace(j.profile.display_name&&j.profile.phone_number&&j.profile.campus_id?next:'/onboarding')};
 
  async function sendVerification(){
   setBusy(true);setError('');

@@ -23,8 +23,8 @@ const steps=[
 ] as const;
 
 export default function Home(){
- const[d,setD]=useState<Dashboard|null>(null);const tour=useTour('cg:tour:v1');
- useEffect(()=>{if(tour.seen())return;const t=window.setTimeout(()=>tour.start(),900);return()=>clearTimeout(t)},[tour.seen,tour.start]);
+ const[d,setD]=useState<Dashboard|null>(null);const{seen,start}=useTour('cg:tour:v1');
+ useEffect(()=>{if(seen())return;const t=window.setTimeout(()=>start(),900);return()=>clearTimeout(t)},[seen,start]);
  useEffect(()=>{fetch('/api/dashboard',{cache:'no-store'}).then(async r=>r.status===401?{authenticated:false}:r.ok?r.json():{authenticated:false}).then(setD).catch(()=>setD({authenticated:false}))},[]);
  const first=useMemo(()=>d?.profile?.display_name?.trim().split(/\s+/)[0]||'there',[d]);
  const campusLabel=d?.campus?.name?(d.campus.city?d.campus.name+' · '+d.campus.city:d.campus.name):'Your campus';
@@ -70,7 +70,7 @@ export default function Home(){
      </Link>
    </section>
 
-   <section className="home-process" id="tour-how"> aria-label="How CarryGo works">
+   <section className="home-process" id="tour-how" aria-label="How CarryGo works">
      <div className="section-label"><span>HOW IT WORKS</span><span>THREE MOVES</span></div>
      <div className="home-process-grid">
        {steps.map(([n,k,copy])=><motion.article key={n} className="home-process-step" initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:.25,delay:Number(n)*.04}}>

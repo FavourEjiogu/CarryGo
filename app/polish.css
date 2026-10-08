@@ -311,3 +311,19 @@ h1 em,h2 em,h3 em{font-style:normal;color:var(--purple)}
 .progress-card-list{display:grid;gap:8px;margin:12px 0}.progress-card{display:grid;grid-template-columns:42px 1fr auto;gap:11px;align-items:center;padding:13px}.progress-card-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:var(--paper)}.progress-card-icon svg{width:18px}.progress-card-icon.dark{background:var(--ink);color:#fff}.progress-card>div:nth-child(2){display:grid;gap:3px}.progress-card b{font-size:12px}.progress-card span{color:var(--muted);font-size:9px}.progress-ring{position:relative;width:52px;height:52px;display:grid;place-items:center}.progress-ring svg{position:absolute;inset:0;width:52px;height:52px}.progress-ring strong{position:relative;font:900 9px var(--font-display)}
 .profile-identity{grid-template-columns:auto 1fr auto;align-items:center}.profile-avatar-preview{width:54px;height:54px;display:grid;place-items:center;border-radius:50%;overflow:hidden;background:var(--paper);border:1px solid var(--line)}.profile-avatar-preview img{width:100%;height:100%;object-fit:cover}.profile-identity>div:nth-child(2){display:grid;gap:3px}.profile-identity>div:nth-child(2) span,.profile-identity>div:nth-child(2) small{font-size:9px;color:var(--muted)}
 @media(max-width:620px){.faq-security{grid-template-columns:1fr}.faq-icon{grid-row:auto}.faq-security .sub,.faq-security .actions{grid-column:auto}.profile-identity{grid-template-columns:auto 1fr}.profile-identity>.btn{grid-column:1/-1;width:100%}}
+
+/* Touch-safe message replies and desktop-only cursor interaction */
+.desktop-eyes-only{display:none!important;pointer-events:none}
+.swipeable-message{touch-action:pan-y;will-change:transform;transition:transform .16s var(--ease),background .16s ease}
+.swipeable-message.swiping{user-select:none;cursor:grabbing}
+.message-reply-trigger{opacity:0;transform:translateY(2px);transition:opacity .15s ease,transform .15s var(--ease)}
+.bubble:hover .message-reply-trigger,.bubble:focus-within .message-reply-trigger{opacity:.8;transform:none}
+.reply-preview{animation:replyIn .18s var(--ease)}
+@keyframes replyIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.typing-cue{display:flex;align-items:center;gap:4px;padding:6px 2px;color:var(--muted);font-size:9px}
+.typing-cue i{width:5px;height:5px;border-radius:50%;background:var(--purple);animation:typingPulse 1s infinite ease-in-out}
+.typing-cue i:nth-child(2){animation-delay:.12s}.typing-cue i:nth-child(3){animation-delay:.24s}
+@keyframes typingPulse{0%,100%{opacity:.28;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)}}
+@media (min-width:901px) and (hover:hover) and (pointer:fine){.desktop-eyes-only{display:flex!important;pointer-events:auto}}
+@media (hover:none),(pointer:coarse){.desktop-eyes-only{display:none!important}}
+@media (prefers-reduced-motion:reduce){.swipeable-message{transition:none}}
