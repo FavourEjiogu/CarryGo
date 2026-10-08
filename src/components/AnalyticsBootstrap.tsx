@@ -6,11 +6,18 @@ import posthog from 'posthog-js';
 const CONSENT_KEY = 'cg:privacy-consent';
 let initialised = false;
 
-function initialise() {
+function syncConsent() {
   if (typeof window === 'undefined') return;
+  const consent = window.localStorage.getItem(CONSENT_KEY);
+  if (consent !== 'analytics') {
+    if (initialised) posthog.opt_out_capturing();
+    return;
+  }
   if (window.navigator.doNotTrack === '1') return;
-  if (window.localStorage.getItem(CONSENT_KEY) !== 'analytics') return;
-  if (initialised) return;
+  if (initialised) {
+    posthog.opt_in_capturing();
+    return;
+  }
 
   const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
   const host = process.env.NEXT_PUBLIC_POSTHOG_HOST;
@@ -25,14 +32,16 @@ function initialise() {
     disable_session_recording: true,
     persistence: 'memory',
     respect_dnt: true,
+    opt_out_capturing_by_default: true,
+    consent_persistence_name: 'cg:posthog-consent',
   });
   initialised = true;
 }
 
 export function AnalyticsBootstrap() {
   useEffect(() => {
-    initialise();
-    const handler = () => initialise();
+    syncConsent();
+    const handler = () => syncConsent();
     window.addEventListener('cg:privacy-consent', handler);
     return () => window.removeEventListener('cg:privacy-consent', handler);
   }, []);
