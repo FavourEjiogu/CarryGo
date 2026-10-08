@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveCampusPlace } from './place-resolution.ts';
+import { resolveCampusPlace } from './place-resolution';
 
 const places = [
   { label: 'Green Plaza', locationId: '1', kind: 'Food' },
