@@ -18,6 +18,6 @@
   ],
   "shortcuts": [
     {"name": "Post a task", "short_name": "Post task", "url": "/do", "icons": [{"src": "/icon-192.png", "sizes": "192x192", "type": "image/png"}]},
-    {"name": "Find a task to earn", "short_name": "Earn", "url": "/earn", "icons": [{"src": "/icon.svg", "sizes": "96x96", "type": "image/svg+xml"}]}
+    {"name": "Find a task to earn", "short_name": "Earn", "url": "/earn", "icons": [{"src": "/icon-192.png", "sizes": "192x192", "type": "image/png"}]}
   ]
 }
