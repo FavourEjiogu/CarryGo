@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -8,10 +9,12 @@ type BeforeInstallPromptEvent = Event & {
 };
 
 export function InstallPrompt() {
+  const pathname = usePathname();
   const [event, setEvent] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (pathname !== '/') return;
     const dismissed = localStorage.getItem('cg:install-nudge:v1') === '1';
     const standalone = window.matchMedia('(display-mode: standalone)').matches;
     if (dismissed || standalone) return;
@@ -24,7 +27,7 @@ export function InstallPrompt() {
 
     window.addEventListener('beforeinstallprompt', onBeforeInstall);
     return () => window.removeEventListener('beforeinstallprompt', onBeforeInstall);
-  }, []);
+  }, [pathname]);
 
   if (!visible || !event) return null;
 
