@@ -29,7 +29,7 @@ export default function Login(){
  const[name,setName]=useState(''),[email,setEmail]=useState(''),[code,setCode]=useState(''),[password,setPassword]=useState('');
  const[remember,setRemember]=useState(true),[sent,setSent]=useState(false),[seconds,setSeconds]=useState(0),[busy,setBusy]=useState(false),[error,setError]=useState(''),[passwordFocus,setPasswordFocus]=useState(false);
 
- useEffect(()=>{try{setRemember(localStorage.getItem('cg:remember-me')!=='0')}catch{}const p=new URLSearchParams(location.search);const m=p.get('mode');if(m==='signin'||m==='signup')setMode(m);const mt=p.get('method');if(mt==='otp'||mt==='link'||mt==='password')setMethod(mt);const e=p.get('error');if(e)setError(ERROR_COPY[e]||'Something went wrong. Try again.')},[]);
+ useEffect(()=>{const timer=window.setTimeout(()=>{try{setRemember(localStorage.getItem('cg:remember-me')!=='0')}catch{}const p=new URLSearchParams(window.location.search);const m=p.get('mode');if(m==='signin'||m==='signup')setMode(m);const mt=p.get('method');if(mt==='otp'||mt==='link'||mt==='password')setMethod(mt);const e=p.get('error');if(e)setError(ERROR_COPY[e]||'Something went wrong. Try again.')},0);return()=>window.clearTimeout(timer)},[]);
  useEffect(()=>{if(!seconds)return;const t=window.setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(t)},[seconds]);
 
  const title=useMemo(()=>mode==='signup'?<>A better way to <em>get things done.</em></>:<>Welcome <em>back.</em></>,[mode]);
