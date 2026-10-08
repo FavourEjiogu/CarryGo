@@ -53,7 +53,7 @@ export default function DoPage(){
 
  useEffect(()=>{
    let live=true;
-   if(!pickupId||!destinationId){setSuggestion(null);return()=>{}}
+   if(!pickupId||!destinationId)return()=>{}
    const timer=window.setTimeout(async()=>{
      const r=await fetch('/api/tasks/suggestions?pickup_id='+encodeURIComponent(pickupId)+'&destination_id='+encodeURIComponent(destinationId),{cache:'no-store'});
      if(!r.ok)return;
@@ -66,8 +66,8 @@ export default function DoPage(){
  const chooseTemplate=(name:string,desc:string)=>{setTemplate(name);if(!title&&!touched.current.title)setTitle(name==='Food'?'Pick up food':'Carry out a task');if(!description)setDescription(desc)};
  const pick=(place:PlaceSuggestion)=>{touched.current.pickup=true;setPickup(place.label);setPickupId(place.locationId);setPickupKind(place.merchant?place.merchant.category:place.kind);setPickupMerchant(place.merchant||undefined);if(!title&&!touched.current.title)setTitle('Pick up from '+place.label)};
  const drop=(place:PlaceSuggestion)=>{touched.current.destination=true;setDestination(place.label);setDestinationId(place.locationId);setDestinationKind(place.merchant?place.merchant.category:place.kind);if(place.kind==='Hostel')setMode('HOSTEL')};
- const changePickup=(value:string)=>{touched.current.pickup=true;setPickup(value);setPickupId(null);setPickupKind('');setPickupMerchant(undefined)};
- const changeDestination=(value:string)=>{touched.current.destination=true;setDestination(value);setDestinationId(null);setDestinationKind('')};
+ const changePickup=(value:string)=>{touched.current.pickup=true;setPickup(value);setPickupId(null);setPickupKind('');setPickupMerchant(undefined);setSuggestion(null)};
+ const changeDestination=(value:string)=>{touched.current.destination=true;setDestination(value);setDestinationId(null);setDestinationKind('');setSuggestion(null)};
  const applyDetected=()=>{if(!understanding?.pickup&&!understanding?.destination)return;const confidence=understanding.confidence;if(understanding.pickup&&!touched.current.pickup)setPickup(understanding.pickup);if(understanding.destination&&!touched.current.destination)setDestination(understanding.destination);track('task route applied',{confidence:confidence});};
  const swapLocations=()=>{touched.current.pickup=true;touched.current.destination=true;const p=pickup,d=destination,pk=pickupKind,dk=destinationKind,pi=pickupId,di=destinationId,pm=pickupMerchant;setPickup(d);setDestination(p);setPickupKind(dk);setDestinationKind(pk);setPickupId(di);setDestinationId(pi);setPickupMerchant(undefined);}
  const applySuggestion=()=>{if(!suggestion)return;setFee(String(Math.round(Number(suggestion.suggested_fee_kobo||0)/100)));setEta(String(suggestion.suggested_eta_minutes||30));track('route suggestion applied',{sampleCount:suggestion.sample_count})};
