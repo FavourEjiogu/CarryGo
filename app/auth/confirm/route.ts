@@ -10,7 +10,7 @@ function safeNext(value:string|null){
 
 export async function GET(request:Request){
   const url=new URL(request.url);
-  const origin=getSiteOrigin(origin);
+  const origin=getSiteOrigin(url.origin);
   const tokenHash=url.searchParams.get('token_hash');
   const type=url.searchParams.get('type') as EmailOtpType|null;
   const next=safeNext(url.searchParams.get('next'));
