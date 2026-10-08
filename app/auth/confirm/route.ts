@@ -21,6 +21,6 @@ export async function GET(request:Request){
   const{data:profile}=await supabase.from('users').select('display_name,phone_number,campus_id').eq('id',user.id).maybeSingle();
   if(!profile?.display_name||!profile?.phone_number||!profile?.campus_id) return NextResponse.redirect(new URL('/onboarding',url.origin));
   const{data:aal}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  if(aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2') return NextResponse.redirect(new URL('/mfa?next='+encodeURIComponent(next),url.origin));
+  if(aal?.nextLevel==='aal2'&&aal?.currentLevel!=='aal2') return NextResponse.redirect(new URL('/mfa?next='+encodeURIComponent(next),url.origin));
   return NextResponse.redirect(new URL(next,url.origin));
 }
