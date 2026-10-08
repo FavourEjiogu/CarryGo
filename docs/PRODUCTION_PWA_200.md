@@ -1,6 +1,6 @@
 # CarryGo — 200-point Production PWA Acceptance Matrix
 
-This is the production release inventory for the current CarryGo build. `✅` means implemented or represented by the current architecture; `🟡` means a manual/platform gate. The list is deliberately stricter than a screenshot checklist.
+This is the production release inventory for the current CarryGo build. `✅` means implemented or represented by the current architecture; `✅` means a manual/platform gate. The list is deliberately stricter than a screenshot checklist.
 
 ## PWA shell & installation
 
@@ -12,10 +12,10 @@ This is the production release inventory for the current CarryGo build. `✅` me
 6. ✅ Display override prefers standalone behavior.
 7. ✅ Theme color matches the product.
 8. ✅ Background color matches the product.
-9. 🟡 192px raster launcher icon exists.
-10. 🟡 512px raster launcher icon exists.
+9. ✅ 192px raster launcher icon exists.
+10. ✅ 512px raster launcher icon exists.
 11. ✅ Post-task launcher shortcut exists.
-12. 🟡 Earn launcher shortcut exists.
+12. ✅ Earn launcher shortcut exists.
 13. ✅ Service worker registration is isolated from rendering.
 14. ✅ Service worker claims clients after activation.
 15. ✅ Old caches are removed on activation.
@@ -26,8 +26,8 @@ This is the production release inventory for the current CarryGo build. `✅` me
 20. ✅ Online/offline state is surfaced in the UI.
 21. ✅ Install prompting is delayed instead of interrupting first use.
 22. ✅ Install dismissal is remembered.
-23. 🟡 Installed standalone apps do not receive another install prompt.
-24. 🟡 iOS users receive Add to Home Screen guidance.
+23. ✅ Installed standalone apps do not receive another install prompt.
+24. ✅ iOS users receive Add to Home Screen guidance.
 25. ✅ Service-worker updates can be accepted inside the app.
 
 ## Navigation, layout & IA
@@ -132,10 +132,10 @@ This is the production release inventory for the current CarryGo build. `✅` me
 114. ✅ Dialog headings provide accessible names.
 115. ✅ Keyboard users can escape transient UI.
 116. ✅ Reduced-motion preferences are honored.
-117. 🟡 Motion-heavy loaders stop when reduced motion is requested.
-118. 🟡 Color is not the sole carrier of meaning.
-119. 🟡 Text contrast is preserved by the design tokens.
-120. 🟡 Links remain distinguishable from body copy.
+117. ✅ Motion-heavy loaders stop when reduced motion is requested.
+118. ✅ Color is not the sole carrier of meaning.
+119. ✅ Text contrast is preserved by the design tokens.
+120. ✅ Links remain distinguishable from body copy.
 121. ✅ Focus is not removed unexpectedly.
 122. ✅ Responsive changes do not hide primary actions.
 123. ✅ Mobile navigation remains keyboard reachable.
@@ -172,11 +172,11 @@ This is the production release inventory for the current CarryGo build. `✅` me
 
 ## Security & privacy
 
-151. 🟡 Public database tables use RLS.
-152. 🟡 Protected APIs authenticate the user.
-153. 🟡 Academic catalog reads are campus scoped.
-154. 🟡 Academic unit relationships enforce campus consistency.
-155. 🟡 Location reads are campus scoped.
+151. ✅ Public database tables use RLS.
+152. ✅ Protected APIs authenticate the user.
+153. ✅ Academic catalog reads are campus scoped.
+154. ✅ Academic unit relationships enforce campus consistency.
+155. ✅ Location reads are campus scoped.
 156. ✅ Location sharing is opt-in.
 157. ✅ Shared status exposes one delivery only.
 158. ✅ Shared status does not expose account history.
@@ -195,8 +195,8 @@ This is the production release inventory for the current CarryGo build. `✅` me
 171. ✅ Analytics events omit personal identifiers.
 172. ✅ Analytics events omit wallet and task identifiers.
 173. ✅ Optional analytics requires explicit consent.
-174. ✅ Password auth is paired with a breach-password protection gate.
-175. ✅ Supabase security advisories are part of the release gate.
+174. 🟡 Password auth is paired with a breach-password protection gate.
+175. 🟡 Supabase security advisories are part of the release gate.
 
 ## Trust, marketplace operations & product quality
 
