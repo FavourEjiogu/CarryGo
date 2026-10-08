@@ -1,6 +1,6 @@
 import type{Metadata}from'next';
 import{createHash}from'node:crypto';
-import{createSupabaseAdminClient}from'@/src/lib/supabase/admin';
+import{createSupabaseServerClient}from'@/src/lib/supabase/server';
 
 export const dynamic='force-dynamic';
 export const metadata:Metadata={title:'CarryGo status',robots:{index:false,follow:false}};
@@ -16,22 +16,18 @@ const labels:Record<string,string>={
 export default async function SharedStatus({params}:{params:Promise<{token:string}>}){
  const{token}=await params;
  const hash=createHash('sha256').update(token||'').digest('hex');
- const admin=createSupabaseAdminClient();
- const{data:share}=await admin.from('shared_task_status').select('expires_at,revoked_at,errand_id').eq('token_hash',hash).maybeSingle();
- let content=<div className="error" role="alert">This status link is unavailable.</div>;
- if(share&&!share.revoked_at&&new Date(share.expires_at)>new Date()){
-   const{data:task}=await admin.from('errands').select('title,status,pickup_location_text,destination_location_text,updated_at,scheduled_for').eq('id',share.errand_id).maybeSingle();
-   if(task){
-     content=<>
-       <div className="section-label"><span>LIVE</span><span>Expires {new Date(share.expires_at).toLocaleTimeString()}</span></div>
-       <h2>{task.title}</h2>
-       <div className="shared-route"><span>{task.pickup_location_text||'Pickup'}</span><b>→</b><span>{task.destination_location_text||'Destination'}</span></div>
-       <strong className="shared-state">{labels[task.status]||task.status.replaceAll('_',' ')}</strong>
-       <small>Updated {new Date(task.updated_at).toLocaleTimeString()}</small>
-     </>;
-   }
- } else if(share){
-   content=<div className="error" role="alert">This status link has expired.</div>;
+ const s=await createSupabaseServerClient();
+ const{data:rows}=await s.rpc('get_shared_task_status',{p_token_hash:hash});
+ const task=rows?.[0];
+ let content=<div className="error" role="alert">This status link is unavailable or has expired.</div>;
+ if(task){
+   content=<>
+     <div className="section-label"><span>LIVE</span><span>Expires {new Date(task.expires_at).toLocaleTimeString()}</span></div>
+     <h2>{task.title}</h2>
+     <div className="shared-route"><span>{task.pickup_location_text||'Pickup'}</span><b>→</b><span>{task.destination_location_text||'Destination'}</span></div>
+     <strong className="shared-state">{labels[task.status]||String(task.status).replaceAll('_',' ')}</strong>
+     <small>Updated {new Date(task.updated_at).toLocaleTimeString()}</small>
+   </>;
  }
  return <main className="shell app-page narrow shared-status-page">
    <div className="eyebrow">CARRYGO · SHARED STATUS</div>
