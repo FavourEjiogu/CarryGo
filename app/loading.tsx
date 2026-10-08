@@ -1,3 +1,3 @@
 export default function Loading(){
-  return <main className="center"><div className="auth-loading"><span className="brand"><i className="brand-dot"/>CarryGo</span><div className="loader-line"/></div></main>
+  return <main className="center app-loading" aria-busy="true"><div className="auth-loading"><span className="brand"><i className="brand-dot"/>CarryGo</span><div className="loading-copy" aria-live="polite"><strong>Getting things ready.</strong><span>Loading your next move…</span></div><div className="loader-line" role="progressbar" aria-label="Loading CarryGo"><i/></div><div className="loading-dots" aria-hidden="true"><i/><i/><i/></div></div></main>
 }
