@@ -138,7 +138,7 @@ A release-oriented audit of patterns commonly found in polished task-marketplace
 111. ✅ Implemented — Essential session cookies
 112. ✅ Implemented — One-time privacy choice
 113. ✅ Implemented — Analytics opt-in
-114. 🟡 Partial / dependent — Analytics opt-out path
+114. ✅ Implemented — Analytics opt-out path
 115. ✅ Implemented — Privacy page
 116. ✅ Implemented — Cookies/device-storage explanation
 117. ✅ Implemented — No analytics cookie persistence
