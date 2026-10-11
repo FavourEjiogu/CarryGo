@@ -34,31 +34,43 @@ function wrapText(
   lineHeight: number,
   maxLines: number,
 ): number {
-  const words = cleanText(text).split(" ");
+  const words = cleanText(text).split(" ").filter(Boolean);
   let line = "";
-  let lineCount = 0;
-  for (const word of words) {
+  let linesDrawn = 0;
+
+  while (words.length > 0) {
+    const word = words.shift()!;
     const candidate = line ? line + " " + word : word;
     if (context.measureText(candidate).width > maxWidth && line) {
-      context.fillText(line, x, y + lineCount * lineHeight);
-      lineCount += 1;
+      if (linesDrawn === maxLines - 1) {
+        let finalLine = (line + " " + word).trim();
+        while (finalLine.length > 1 && context.measureText(finalLine + "…").width > maxWidth) {
+          finalLine = finalLine.slice(0, -1);
+        }
+        context.fillText(finalLine + "…", x, y + linesDrawn * lineHeight);
+        return maxLines;
+      }
+      context.fillText(line, x, y + linesDrawn * lineHeight);
+      linesDrawn += 1;
       line = word;
-      if (lineCount === maxLines - 1) break;
     } else {
       line = candidate;
     }
   }
-  if (lineCount < maxLines && line) {
-    const remainder = words.slice(Math.max(0, words.indexOf(line.split(" ")[0])));
-    const joined = lineCount === maxLines - 1 && remainder.length > line.split(" ").length
-      ? line.replace(/\s+\S*$/, "…")
-      : line;
-    context.fillText(joined, x, y + lineCount * lineHeight);
-    lineCount += 1;
-  }
-  return lineCount;
-}
 
+  if (line && linesDrawn < maxLines) {
+    let finalLine = line;
+    if (context.measureText(finalLine).width > maxWidth) {
+      while (finalLine.length > 1 && context.measureText(finalLine + "…").width > maxWidth) {
+        finalLine = finalLine.slice(0, -1);
+      }
+      finalLine += "…";
+    }
+    context.fillText(finalLine, x, y + linesDrawn * lineHeight);
+    linesDrawn += 1;
+  }
+  return linesDrawn;
+}
 function fitUrl(context: CanvasRenderingContext2D, url: string, maxWidth: number): string {
   let value = cleanText(url, 180);
   while (value.length > 16 && context.measureText(value).width > maxWidth) {
@@ -166,7 +178,7 @@ export async function downloadCarryGoStatusCard(input: CarryGoShareCardInput): P
   context.fillText("VIEW THE LIVE STATUS", 94, 454);
   context.fillStyle = muted;
   context.font = "600 15px ui-sans-serif, system-ui, sans-serif";
-  const safeUrl = fitUrl(context, input.url, 850);
+  const safeUrl = fitUrl(context, input.url, 1000);
   context.fillText(safeUrl, 94, 475);
 
   context.fillStyle = ink;
