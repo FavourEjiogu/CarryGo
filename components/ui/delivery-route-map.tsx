@@ -122,7 +122,7 @@ export function DeliveryRouteMap({
           style: "https://tiles.openfreemap.org/styles/liberty",
           center: [8, 8],
           zoom: 5,
-          attributionControl: true,
+          attributionControl: {},
           pitchWithRotate: false,
           dragRotate: false,
           cooperativeGestures: true,
