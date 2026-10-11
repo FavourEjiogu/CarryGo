@@ -250,8 +250,8 @@ export function DeliveryRouteMap({
       <div
         ref={canvasRef}
         className="delivery-map-canvas"
-        role="img"
-        aria-label={`Map for delivery from ${pickupText} to ${destinationText}`}
+        role="region"
+        aria-label={`Interactive map for delivery from ${pickupText} to ${destinationText}`}
       />
       <div className="delivery-map-badge">
         <span className="delivery-map-live-dot" />
