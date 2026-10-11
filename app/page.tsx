@@ -62,12 +62,14 @@ const TOUR_STEPS: TourStep[] = [
 export default function Home() {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const tour = useTour('cg:tour:v2');
+  const tourSeen = tour.seen;
+  const startTour = tour.start;
 
   useEffect(() => {
-    if (tour.seen()) return;
-    const timer = window.setTimeout(() => tour.start(), 1200);
+    if (tourSeen()) return;
+    const timer = window.setTimeout(() => startTour(), 1200);
     return () => window.clearTimeout(timer);
-  }, [tour.seen, tour.start]);
+  }, [tourSeen, startTour]);
 
   useEffect(() => {
     fetch('/api/dashboard', { cache: 'no-store' })
