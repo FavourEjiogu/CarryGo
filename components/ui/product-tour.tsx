@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { ArrowRight, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
@@ -333,9 +334,9 @@ export function useTour(storageKey?: string) {
 }
 
 function IconX() {
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" className="h-4 w-4"><path d="M6 6l12 12M18 6L6 18" /></svg>;
+  return <X aria-hidden="true" className="h-4 w-4" />;
 }
 
 function IconArrow({ className = "" }: { className?: string }) {
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" className={`h-3.5 w-3.5 ${className}`}><path d="M5 12h14M13 6l6 6-6 6" /></svg>;
+  return <ArrowRight aria-hidden="true" className={`h-3.5 w-3.5 ${className}`} />;
 }
