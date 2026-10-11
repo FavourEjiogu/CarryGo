@@ -41,9 +41,8 @@ async function shareStatus(){
 async function downloadStatusCard(){
   const url=await ensureShareUrl();if(!url)return;
   try{
-    const isPrivateRoom=t.delivery_mode==='ROOM';
     await downloadCarryGoStatusCard({
-      title:t.title||'CarryGo delivery',
+      title:'Delivery update',
       status:t.status,
       pickup:'Pickup details stay private',
       destination:'Drop-off details stay private',
