@@ -13,10 +13,13 @@ type Mode = "checking" | "animated" | "static";
 export function CarryGoWordmark() {
   const [mode, setMode] = useState<Mode>("checking");
   useEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let alreadyPlayed = false;
-    try { alreadyPlayed = window.sessionStorage.getItem(PLAYED_KEY) === "1"; } catch { /* storage can be blocked */ }
-    setMode(!reducedMotion && !alreadyPlayed ? "animated" : "static");
+    const timer = window.setTimeout(() => {
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let alreadyPlayed = false;
+      try { alreadyPlayed = window.sessionStorage.getItem(PLAYED_KEY) === "1"; } catch { /* storage can be blocked */ }
+      setMode(!reducedMotion && !alreadyPlayed ? "animated" : "static");
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
   const finish = useCallback(() => {
     try { window.sessionStorage.setItem(PLAYED_KEY, "1"); } catch { /* storage can be blocked */ }
