@@ -18,23 +18,43 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
 
 export async function POST(request:Request,{params}:{params:Promise<{id:string}>}){
   const {id}=await params;
+  const noStore={'cache-control':'private, no-store'};
   const s=await createSupabaseServerClient();
   const {data:{user}}=await s.auth.getUser();
-  if(!user)return NextResponse.json({error:'Sign in required'},{status:401});
-  const b=await request.json().catch(()=>null);
-  if(!b||typeof b!=='object')return NextResponse.json({error:'Invalid location payload.'},{status:400});
-  const latitude=Number(b.latitude),longitude=Number(b.longitude),accuracy=Number(b.accuracy_m),sequence=Number(b.sequence);
-  const captured=b.captured_at?new Date(b.captured_at):null;
+  if(!user)return NextResponse.json({error:'Sign in required'},{status:401,headers:noStore});
+
+  const body=await request.json().catch(()=>null);
+  if(!body||typeof body!=='object'||Array.isArray(body))return NextResponse.json({error:'Invalid location payload.'},{status:400,headers:noStore});
+  if(body.taskId!==undefined&&body.taskId!==id)return NextResponse.json({error:'Location payload does not match this task.'},{status:400,headers:noStore});
+
+  const {latitude,longitude,accuracy_m:accuracy,sequence}=body;
   if(
-    !Number.isFinite(latitude)||latitude < -90||latitude > 90||
-    !Number.isFinite(longitude)||longitude < -180||longitude > 180||
-    !Number.isFinite(accuracy)||accuracy < 0||accuracy > 100000||
-    !Number.isSafeInteger(sequence)||sequence < 1||
-    !captured||Number.isNaN(captured.getTime())
-  )return NextResponse.json({error:'Invalid location payload.'},{status:400,headers:{'cache-control':'no-store'}});
+    typeof latitude!=='number'||!Number.isFinite(latitude)||latitude < -90||latitude > 90||
+    typeof longitude!=='number'||!Number.isFinite(longitude)||longitude < -180||longitude > 180||
+    typeof accuracy!=='number'||!Number.isFinite(accuracy)||accuracy < 0||accuracy > 10000||
+    typeof sequence!=='number'||!Number.isSafeInteger(sequence)||sequence < 1||
+    typeof body.captured_at!=='string'||!body.captured_at
+  )return NextResponse.json({error:'Invalid location payload.'},{status:400,headers:noStore});
+
+  const captured=new Date(body.captured_at);
+  if(Number.isNaN(captured.getTime()))return NextResponse.json({error:'Invalid location timestamp.'},{status:400,headers:noStore});
   const age=Date.now()-captured.getTime();
-  if(age < -30000||age > 2*60*1000)return NextResponse.json({error:'This location update is too old or has an invalid timestamp. A fresh GPS update is needed.'},{status:400,headers:{'cache-control':'no-store'}});
-  const {data,error}=await s.rpc('record_delivery_location',{p_errand_id:id,p_latitude:latitude,p_longitude:longitude,p_accuracy_m:accuracy,p_captured_at:captured.toISOString(),p_client_sequence:sequence});
-  if(error)return NextResponse.json({error:'Could not accept this location update.'},{status:400,headers:{'cache-control':'no-store'}});
-  return NextResponse.json(data,{headers:{'cache-control':'private, no-store'}});
+  if(age < -30000||age > 2*60*1000)return NextResponse.json({error:'This location update is too old or has an invalid timestamp. A fresh GPS update is needed.'},{status:400,headers:noStore});
+
+  // The database also serializes active-session writes. This API limit controls
+  // authenticated callers before the RPC and returns private/no-store throughout.
+  const {data:withinLimit,error:limitError}=await s.rpc('consume_rate_limit',{p_scope:'delivery-location',p_limit:120,p_window_seconds:600});
+  if(limitError)return NextResponse.json({error:'Could not verify location update limits. Try again.'},{status:503,headers:noStore});
+  if(!withinLimit)return NextResponse.json({error:'Location updates are arriving too quickly. Try again shortly.'},{status:429,headers:{...noStore,'retry-after':'60'}});
+
+  const {data,error}=await s.rpc('record_delivery_location',{
+    p_errand_id:id,
+    p_latitude:latitude,
+    p_longitude:longitude,
+    p_accuracy_m:accuracy,
+    p_captured_at:captured.toISOString(),
+    p_client_sequence:sequence
+  });
+  if(error)return NextResponse.json({error:'Could not accept this location update.'},{status:400,headers:noStore});
+  return NextResponse.json(data,{headers:noStore});
 }
