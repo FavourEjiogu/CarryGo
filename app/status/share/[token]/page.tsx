@@ -24,7 +24,7 @@ export default async function SharedStatus({params}:{params:Promise<{token:strin
    content=<>
      <div className="section-label"><span>LIVE</span><span>Expires {new Date(task.expires_at).toLocaleTimeString()}</span></div>
      <h2>{task.title}</h2>
-     <div className="shared-route"><span>{task.pickup_location_text||'Pickup'}</span><b>→</b><span>{task.destination_location_text||'Destination'}</span></div>
+     <div className="shared-route"><span>Pickup details private</span><b>→</b><span>Drop-off details private</span></div>
      <strong className="shared-state">{labels[task.status]||String(task.status).replaceAll('_',' ')}</strong>
      <small>Updated {new Date(task.updated_at).toLocaleTimeString()}</small>
    </>;
@@ -32,6 +32,10 @@ export default async function SharedStatus({params}:{params:Promise<{token:strin
  return <main className="shell app-page narrow shared-status-page">
    <div className="eyebrow">CARRYGO · SHARED STATUS</div>
    <h1 className="app-title">Delivery status</h1>
-   <div className="card form">{content}<p className="soft-note">This page shows only this delivery. It does not expose your account or location history.</p></div>
+   <div className="card form">{content}<p className="soft-note">This page shows only this delivery's status. Exact pickup and drop-off details, account information and location history stay private to task participants.</p></div>
+   <footer className="shared-status-brand">
+     <div><div className="shared-status-watermark">CarryGo · Campus execution network</div><small>carrygo-chi.vercel.app</small></div>
+     <a href="/">Open CarryGo →</a>
+   </footer>
  </main>;
 }
