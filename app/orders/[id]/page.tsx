@@ -45,8 +45,8 @@ async function downloadStatusCard(){
     await downloadCarryGoStatusCard({
       title:t.title||'CarryGo delivery',
       status:t.status,
-      pickup:isPrivateRoom?'Private pickup':t.pickup_location_text||'Pickup',
-      destination:isPrivateRoom?'Private drop-off':t.destination_location_text||'Drop-off',
+      pickup:'Pickup details stay private',
+      destination:'Drop-off details stay private',
       url,
     });
   }catch(e){setError(e instanceof Error?e.message:'Could not download the branded image.')}
