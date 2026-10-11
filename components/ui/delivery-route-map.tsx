@@ -151,12 +151,15 @@ export function DeliveryRouteMap({
             },
           });
           // Pulse the route stroke subtly so the map feels active without implying live movement.
-          pulseTimer = window.setInterval(() => {
-            if (disposed || !map || !map.getLayer("carrygo-route-line")) return;
-            pulseStep = !pulseStep;
-            map.setPaintProperty("carrygo-route-line", "line-width", pulseStep ? 4.8 : 3.6);
-            map.setPaintProperty("carrygo-route-line", "line-opacity", pulseStep ? 0.98 : 0.74);
-          }, 850);
+          const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          if (!reduceMotion) {
+            pulseTimer = window.setInterval(() => {
+              if (disposed || !map || !map.getLayer("carrygo-route-line")) return;
+              pulseStep = !pulseStep;
+              map.setPaintProperty("carrygo-route-line", "line-width", pulseStep ? 4.8 : 3.6);
+              map.setPaintProperty("carrygo-route-line", "line-opacity", pulseStep ? 0.98 : 0.74);
+            }, 850);
+          }
           setMapReady(true);
         });
 
