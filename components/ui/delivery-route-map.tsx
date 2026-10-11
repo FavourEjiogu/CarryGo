@@ -170,7 +170,7 @@ export function DeliveryRouteMap({
       { key: "pickup", label: pickupPoint?.name || "Pickup", point: pickup, className: "pickup" },
       { key: "destination", label: destinationPoint?.name || "Drop-off", point: destination, className: "dropoff" },
       { key: "runner", label: "Runner · live", point: runner, className: "runner" },
-      { key: "payer", label: "You · live", point: payer, className: "payer" },
+      { key: "payer", label: "Other participant · live", point: payer, className: "payer" },
     ];
 
     for (const entry of entries) {
