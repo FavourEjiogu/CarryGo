@@ -29,7 +29,15 @@ type DeliveryRouteMapProps = {
 };
 
 function validCoordinate(value: RouteCoordinate | LiveCoordinate | null | undefined): Coordinate | null {
-  if (!value) return null;
+  if (
+    !value ||
+    value.latitude === null ||
+    value.latitude === undefined ||
+    value.latitude === "" ||
+    value.longitude === null ||
+    value.longitude === undefined ||
+    value.longitude === ""
+  ) return null;
   const latitude = Number(value.latitude);
   const longitude = Number(value.longitude);
   if (
