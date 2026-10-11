@@ -13,9 +13,14 @@ export function CookieConsent(){
   const[visible,setVisible]=useState(false);
   useEffect(()=>{
     if(!PUBLIC_PATHS.has(pathname)) return;
-    try{
-      if(!window.localStorage.getItem(KEY)) setVisible(true);
-    }catch{setVisible(true)}
+    let active=true;
+    const timer=window.setTimeout(()=>{
+      if(!active) return;
+      try{
+        if(!window.localStorage.getItem(KEY)) setVisible(true);
+      }catch{setVisible(true)}
+    },0);
+    return ()=>{active=false;window.clearTimeout(timer)};
   },[pathname]);
   if(!visible||!PUBLIC_PATHS.has(pathname)) return null;
   function choose(value:'granted'|'denied'){
