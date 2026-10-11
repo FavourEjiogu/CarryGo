@@ -11,12 +11,13 @@ returns table(
   expires_at timestamptz
 )
 language sql
-security invoker
+security definer
 set search_path to ''
 as $function$
   select shared.status, shared.updated_at, shared.expires_at
   from private.get_shared_task_status_impl(p_token_hash) as shared
 $function$;
 
+revoke execute on function private.get_shared_task_status_impl(text) from public, anon, authenticated;
 revoke execute on function public.get_shared_task_status(text) from public;
 grant execute on function public.get_shared_task_status(text) to anon, authenticated;
