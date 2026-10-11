@@ -1,1 +1,18 @@
-{"name":"CarryGo","short_name":"CarryGo","description":"Get things done around Bingham campus.","start_url":"/","display":"standalone","background_color":"#f3f3ed","theme_color":"#0b0d0c","icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml"}]}
+{
+  "name":"CarryGo",
+  "short_name":"CarryGo",
+  "description":"A campus execution network for getting everyday things done.",
+  "start_url":"/",
+  "scope":"/",
+  "display":"standalone",
+  "background_color":"#f3f3ed",
+  "theme_color":"#0b0d0c",
+  "orientation":"portrait-primary",
+  "categories":["productivity","lifestyle"],
+  "icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}],
+  "shortcuts":[
+    {"name":"Post a task","short_name":"Post task","url":"/do","icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml"}]},
+    {"name":"Earn","short_name":"Earn","url":"/earn","icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml"}]},
+    {"name":"Orders","short_name":"Orders","url":"/orders","icons":[{"src":"/icon.svg","sizes":"any","type":"image/svg+xml"}]}
+  ]
+}
