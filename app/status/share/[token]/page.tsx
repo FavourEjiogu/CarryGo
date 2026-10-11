@@ -23,7 +23,7 @@ export default async function SharedStatus({params}:{params:Promise<{token:strin
  if(task){
    content=<>
      <div className="section-label"><span>LIVE</span><span>Expires {new Date(task.expires_at).toLocaleTimeString()}</span></div>
-     <h2>{task.title}</h2>
+     <h2>CarryGo delivery</h2>
      <div className="shared-route"><span>Pickup details private</span><b>→</b><span>Drop-off details private</span></div>
      <strong className="shared-state">{labels[task.status]||String(task.status).replaceAll('_',' ')}</strong>
      <small>Updated {new Date(task.updated_at).toLocaleTimeString()}</small>
