@@ -35,7 +35,10 @@
     "react-dropzone": "20.1.2",
     "tailwind-merge": "3.7.0",
     "tailwindcss": "4.3.3",
-    "zod": "4.1.12"
+    "zod": "4.1.12",
+    "@remotion/google-fonts": "4.0.534",
+    "@remotion/player": "4.0.534",
+    "remotion": "4.0.534"
   },
   "devDependencies": {
     "@types/node": "24.7.2",
