@@ -1,5 +1,6 @@
 import type{Metadata}from'next';
 import Link from'next/link';
+import Link from'next/link';
 import{createHash}from'node:crypto';
 import{createSupabaseServerClient}from'@/src/lib/supabase/server';
 
