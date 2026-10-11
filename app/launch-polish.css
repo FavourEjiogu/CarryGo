@@ -10,8 +10,9 @@ h1,h2,h3,h4,h5,h6,.brand,.app-title,.action-tile strong,.home-landing-copy h1,.h
   font-family:var(--font-display);
 }
 h1 em,h2 em,h3 em,h4 em,h5 em,h6 em,.app-title em,.home-landing-copy h1 em,.home-visual-copy em{
-  color:var(--purple)!important;font-style:normal;
+  color:var(--purple)!important;font-style:normal;display:inline;background-image:linear-gradient(rgba(139,103,255,.2),rgba(139,103,255,.2));background-repeat:no-repeat;background-position:left 88%;background-size:0 62%;box-decoration-break:clone;-webkit-box-decoration-break:clone;padding-inline:.035em;border-radius:.12em;animation:carrygo-purple-highlight .82s cubic-bezier(.16,1,.3,1) both;
 }
+@keyframes carrygo-purple-highlight{from{background-size:0 62%}to{background-size:100% 62%}}
 .auth-brand-copy h2 em{color:var(--purple)!important}
 .shell{padding-inline:max(0px,env(safe-area-inset-left))}
 .app-page{padding-top:clamp(24px,4vw,42px);padding-bottom:calc(100px + env(safe-area-inset-bottom))}
@@ -89,3 +90,10 @@ h1 em,h2 em,h3 em,h4 em,h5 em,h6 em,.app-title em,.home-landing-copy h1 em,.home
 
 .home-process .section-label button.text-link{border:0;background:transparent;padding:0;color:var(--purple);font:inherit;font-weight:850;text-align:right;text-underline-offset:4px}
 .home-process .section-label button.text-link:focus-visible{outline:2px solid var(--purple);outline-offset:4px;border-radius:4px}
+
+
+/* The Remotion wordmark is lazy-loaded and played once per browser session. */
+.brand-wordmark-static{display:inline-flex;align-items:center;font-size:19px;font-weight:950;letter-spacing:-.06em;line-height:1;white-space:nowrap}
+.brand-wordmark-motion{display:inline-flex;align-items:center;justify-content:flex-start;width:112px;height:28px;overflow:hidden;flex:0 0 112px}
+.brand-wordmark-motion .remotion-player{overflow:hidden!important}
+@media(prefers-reduced-motion:reduce){h1 em,h2 em,h3 em,h4 em,h5 em,h6 em,.app-title em,.home-landing-copy h1 em,.home-visual-copy em{animation:none;background-size:100% 62%}}
