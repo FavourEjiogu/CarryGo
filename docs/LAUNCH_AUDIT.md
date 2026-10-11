@@ -1,4 +1,4 @@
-# CarryGo implementation verification audit
+| Campus directory map | Replaced the static decorative campus diagram with an interactive MapLibre/OpenFreeMap map. Coordinate-bearing places render as tappable markers with name popups; labels appear at closer zooms to avoid overlap. | Eight coordinate-bearing Bingham places verified in Supabase. Browser visual validation remains pending. |\n# CarryGo implementation verification audit
 
 **Last reviewed:** 2026-10-11  
 **Repository:** `FavourEjiogu/CarryGo`  
