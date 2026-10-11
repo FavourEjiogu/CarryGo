@@ -38,6 +38,26 @@ This document distinguishes code that exists from behavior that has been proven 
 7. **Reproducible installs.** The repository currently has no npm lockfile, and CI runs `npm install`, not `npm ci`. Generate and commit a real lockfile from a clean install before treating dependency resolution as fully reproducible.
 8. **Data/schema change discipline.** Do not apply the deferred academic RLS migration from an old audit branch without comparing it to the current production policies/schema first.
 
+## Other product requirements checked in source/database
+
+These features have implementation surfaces; their presence is not a substitute for full end-to-end acceptance testing.
+
+| Request | Evidence found | Status |
+|---|---|---|
+| FAQ and footer | `app/faq/page.tsx`; `src/components/AppShell.tsx` includes a footer with FAQ, leaderboard, referrals, reviews, security, privacy and terms. | Implemented |
+| Loading screen and toasts | `app/loading.tsx`; `src/components/ToastProvider.tsx`. | Implemented |
+| Tooltips | `components/ui/tooltip.tsx`; desktop/mobile navigation uses Radix tooltip wrappers. | Implemented |
+| Optional 2FA | `app/security/page.tsx` enrolls, challenges, verifies and unenrolls Supabase TOTP factors. | Implemented in source; production account flow not smoke-tested |
+| Weekly top-20 leaderboard | UI calls `get_weekly_leaderboard`; live database function scopes to the viewer's campus, uses Africa/Lagos Monday-week boundaries and returns ranks 1–20. | Verified in source and live DB function |
+| Referral rewards | Live database trigger qualifies referrals on a referred user's completed errand and grants a free-errand credit for each fifth qualifying referral. | Verified in live DB function |
+| Real testimonials | API accepts reviews from users who completed a task, inserts them as `PENDING`, and only displays `APPROVED` reviews. No fake review copy is hard-coded in the page. | Implemented; current review volume may be zero |
+| Password strength / optional password | `components/ui/password-strength.tsx`, `app/security/page.tsx`, `app/reset-password/update/page.tsx`. | Implemented in source |
+| Upload component | `components/ui/file-upload-05.tsx` exists. | Component exists; do not infer every flow uses it |
+| Natural-language task parsing and place resolution | `src/lib/task-parser.ts`, `src/lib/place-resolution.ts` and their tests exist. | Implemented/tested at unit level; production accuracy needs real campus inputs |
+| Runner comparison, task next action, repeat task, shared status and route intelligence | Task detail page contains runner scoring/sorting, status-specific next actions and repeat flow; shared status route exists; live database includes route intelligence functions/tables. | Implemented in source/schema; end-to-end flow not independently tested |
+| At least 20 micro-interactions | Multiple CSS/Motion transitions, status cues, swipe replies, typing indicators, toasts, loading animations and CTA energy borders exist. There is no maintained inventory or automated count proving the exact `20+` acceptance threshold. | Partially verified; do not claim a measured count |
+| Home feel and campus neutrality | Home source is campus-neutral and omits 2G/3G/4G marketing copy; internal low-network details are documented as engineering constraints. | Verified in source/docs |
+
 ## Production dependency failure
 
 The reported `ETARGET` came from stale commit `c83e9ded...` on `fix/final-launch-polish`, which requested `@radix-ui/react-slider@1.3.7`. Current main declares the published `1.4.7`, and the production deployment was created from the merged main commit above.
