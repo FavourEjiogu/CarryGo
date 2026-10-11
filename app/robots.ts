@@ -1,8 +1,9 @@
 import type { MetadataRoute } from 'next';
-
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://carrygo-chi.vercel.app').replace(/\/+$/, '');
+import { getSiteOrigin } from '@/src/lib/site-origin';
 
 export default function robots(): MetadataRoute.Robots {
+  const siteUrl = getSiteOrigin();
+
   return {
     rules: {
       userAgent: '*',

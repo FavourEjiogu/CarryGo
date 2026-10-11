@@ -1,8 +1,8 @@
 import type { MetadataRoute } from 'next';
-
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://carrygo-chi.vercel.app').replace(/\/+$/, '');
+import { getSiteOrigin } from '@/src/lib/site-origin';
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const siteUrl = getSiteOrigin();
   const now = new Date();
   const publicPaths = [
     { path: '/', priority: 1, changeFrequency: 'weekly' as const },
