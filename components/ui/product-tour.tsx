@@ -307,7 +307,11 @@ export function Tour({
 
 export function useTour(storageKey?: string) {
   const [open, setOpen] = React.useState(false);
-  const start = React.useCallback(() => setOpen(true), []);
+  const [index, setIndex] = React.useState(0);
+  const start = React.useCallback(() => {
+    setIndex(0);
+    setOpen(true);
+  }, []);
   const seen = React.useCallback(() => {
     if (!storageKey) return false;
     try { return localStorage.getItem(storageKey) === "1"; } catch { return false; }
@@ -316,7 +320,7 @@ export function useTour(storageKey?: string) {
     if (!storageKey) return;
     try { localStorage.setItem(storageKey, "1"); } catch { /* Storage can be disabled. */ }
   }, [storageKey]);
-  return { open, setOpen, start, seen, markSeen };
+  return { open, setOpen, index, setIndex, start, seen, markSeen };
 }
 
 function IconX() {
