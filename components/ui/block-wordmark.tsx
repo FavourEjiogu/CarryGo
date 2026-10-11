@@ -171,7 +171,7 @@ export function BlockWordmark({
     let cancelled = false;
     const run = () => {
       if (cancelled) return;
-      setMetrics(measureGlyphs(characters, face, fontWeight, fontSize));
+      setMetrics(measureGlyphs(Array.from(text), face, fontWeight, fontSize));
     };
     Promise.all([
       ultraReady(),
