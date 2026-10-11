@@ -41,30 +41,34 @@ export default function Order(){const{id}=useParams<{id:string}>();const router=
  },[id]);
  useEffect(()=>{
   const active=body.trim().length>0;
-  const timer=window.setTimeout(()=>{fetch('/api/tasks/'+id+'/presence',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({is_typing:active})}).catch(()=>{})},active?350:250);
-  return()=>window.clearTimeout(timer);
+  const publish=(value:boolean)=>fetch('/api/tasks/'+id+'/presence',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({is_typing:value})}).catch(()=>{});
+  const timer=window.setTimeout(()=>publish(active),active?350:250);
+  const idle=active?window.setTimeout(()=>publish(false),2500):null;
+  return()=>{window.clearTimeout(timer);if(idle)window.clearTimeout(idle)};
  },[body,id]);
  useEffect(()=>{
   if(!trackOn||!locationSharingAllowed)return;
   if(!navigator.geolocation){setError('This device does not provide location services. You can still follow delivery status and use handoff verification.');setTrackOn(false);return}
-  let active=true;let seq=0;
-  try{const stored=Number(localStorage.getItem('cg:seq:'+id)||0);seq=Number.isSafeInteger(stored)&&stored>0?stored:0}catch{}
+  let active=true;let seq=Date.now()-1;
+  try{const stored=Number(localStorage.getItem('cg:seq:'+id)||0);seq=Number.isSafeInteger(stored)&&stored>0?Math.max(stored,Date.now()-1):Date.now()-1}catch{}
   const enqueue=(payload:{taskId:string;latitude:number;longitude:number;accuracy_m:number;captured_at:string;sequence:number})=>{
    try{queueLocation(payload)}catch{setError('This browser could not save a pending location update. Keep CarryGo open while online.')}
   };
+  const dequeue=(sequence:number)=>{try{removeQueued(id,sequence)}catch{setError('A stored GPS update could not be removed from this device. Clear offline data in You → Privacy if this repeats.')}};
   const deliver=async(payload:{taskId:string;latitude:number;longitude:number;accuracy_m:number;captured_at:string;sequence:number})=>{
    try{
     const response=await fetch('/api/tasks/'+id+'/location',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
     const result=await response.json().catch(()=>({}));
     if(response.status>=500||response.status===429)throw new Error('temporary');
-    if(response.status===401||response.status===403){setError(result.error||'Location sharing is no longer authorized for this task.');return}
-    if(response.ok||response.status<500)removeQueued(id,payload.sequence);
+    if(response.status===401||response.status===403){dequeue(payload.sequence);setError(result.error||'Location sharing is no longer authorized for this task.');setTrackOn(false);return}
+    if(response.ok||response.status<500)dequeue(payload.sequence);
    }catch{enqueue(payload)}
   };
   const send=(position:GeolocationPosition)=>{
    if(!active)return;
-   seq+=1;
+   seq=Math.max(seq+1,Date.now());
    try{localStorage.setItem('cg:seq:'+id,String(seq))}catch{}
+   if(!Number.isFinite(position.coords.accuracy)||position.coords.accuracy<0||position.coords.accuracy>10000){setError('GPS accuracy is too low to share a reliable location. Move to a clearer area and try again.');return}
    const capturedAt=Number.isFinite(position.timestamp)?new Date(position.timestamp).toISOString():new Date().toISOString();
    const payload={taskId:id,latitude:position.coords.latitude,longitude:position.coords.longitude,accuracy_m:position.coords.accuracy,captured_at:capturedAt,sequence:seq};
    if(navigator.onLine)void deliver(payload);else enqueue(payload);
@@ -76,13 +80,21 @@ export default function Order(){const{id}=useParams<{id:string}>();const router=
    else setError('Location lookup timed out. Keep sharing enabled and CarryGo will try again.');
   };
   const watch=navigator.geolocation.watchPosition(send,locationError,{enableHighAccuracy:false,maximumAge:30000,timeout:15000});
-  const retry=window.setInterval(()=>{
+  const flushQueue=()=>{
    if(!active||!navigator.onLine)return;
    let queued:{taskId:string;latitude:number;longitude:number;accuracy_m:number;captured_at:string;sequence:number}[]=[];
    try{queued=readLocationQueue().filter(item=>item.taskId===id)}catch{setError('Could not read pending location updates from this browser.');return}
-   for(const payload of queued)void deliver(payload);
-  },60000);
-  const onOnline=()=>{if(navigator.onLine){try{for(const payload of readLocationQueue().filter(item=>item.taskId===id))void deliver(payload)}catch{}}};
+   if(!queued.length)return;
+   // GPS samples are live operational data, not a trip diary. Keep only the newest queued coordinate.
+   queued.sort((a,b)=>Date.parse(b.captured_at)-Date.parse(a.captured_at));
+   const newest=queued[0];
+   for(const older of queued.slice(1))dequeue(older.sequence);
+   const age=Date.now()-Date.parse(newest.captured_at);
+   if(Number.isFinite(age)&&age>=-30000&&age<=30000)void deliver(newest);
+   else dequeue(newest.sequence);
+  };
+  const retry=window.setInterval(flushQueue,60000);
+  const onOnline=()=>flushQueue();
   window.addEventListener('online',onOnline);
   return()=>{active=false;navigator.geolocation.clearWatch(watch);window.clearInterval(retry);window.removeEventListener('online',onOnline)};
  },[id,trackOn,locationSharingAllowed]);
