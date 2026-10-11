@@ -31,6 +31,18 @@ export type TourProps = {
 type Rect = { top: number; left: number; width: number; height: number };
 const SPRING = { type: "spring" as const, stiffness: 320, damping: 32, mass: 0.7 };
 
+function findVisibleTarget(selector?: string): HTMLElement | null {
+  if (!selector || typeof document === "undefined") return null;
+  try {
+    return Array.from(document.querySelectorAll<HTMLElement>(selector)).find(
+      (element) => element.isConnected && element.getClientRects().length > 0 &&
+        element.getAttribute("aria-hidden") !== "true",
+    ) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(min, value), Math.max(min, max));
 }
@@ -103,8 +115,7 @@ export function Tour({
         setRect(null);
         return;
       }
-      let element: HTMLElement | null = null;
-      try { element = document.querySelector<HTMLElement>(step.target); } catch { element = null; }
+      const element = findVisibleTarget(step.target);
       if (!element?.isConnected) {
         setRect(null);
         return;
@@ -113,8 +124,7 @@ export function Tour({
       setRect({ top: bounds.top, left: bounds.left, width: bounds.width, height: bounds.height });
     };
 
-    let target: HTMLElement | null = null;
-    try { target = step.target ? document.querySelector<HTMLElement>(step.target) : null; } catch { target = null; }
+    const target = findVisibleTarget(step.target);
     target?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center", inline: "nearest" });
     measure();
     settle = window.setTimeout(measure, reduce ? 0 : 340);
