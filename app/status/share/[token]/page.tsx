@@ -1,4 +1,5 @@
 import type{Metadata}from'next';
+import Link from'next/link';
 import{createHash}from'node:crypto';
 import{createSupabaseServerClient}from'@/src/lib/supabase/server';
 
@@ -32,10 +33,10 @@ export default async function SharedStatus({params}:{params:Promise<{token:strin
  return <main className="shell app-page narrow shared-status-page">
    <div className="eyebrow">CARRYGO · SHARED STATUS</div>
    <h1 className="app-title">Delivery status</h1>
-   <div className="card form">{content}<p className="soft-note">This page shows only this delivery's status. Exact pickup and drop-off details, account information and location history stay private to task participants.</p></div>
+   <div className="card form">{content}<p className="soft-note">This page shows only this delivery&apos;s status. Exact pickup and drop-off details, account information and location history stay private to task participants.</p></div>
    <footer className="shared-status-brand">
      <div><div className="shared-status-watermark">CarryGo · Campus execution network</div><small>carrygo-chi.vercel.app</small></div>
-     <a href="/">Open CarryGo →</a>
+     <Link href="/">Open CarryGo →</Link>
    </footer>
  </main>;
 }
