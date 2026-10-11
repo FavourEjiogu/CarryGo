@@ -67,6 +67,7 @@ export function Tour({
   const [cardSize, setCardSize] = React.useState({ w: 320, h: 190 });
   const [vp, setVp] = React.useState({ w: 1024, h: 768 });
   const cardRef = React.useRef<HTMLDivElement>(null);
+  const returnFocusRef = React.useRef<HTMLElement | null>(null);
   const index = controlledIndex ?? indexState;
   const step = steps[index];
   const count = steps.length;
@@ -151,10 +152,22 @@ export function Tour({
 
   React.useEffect(() => {
     if (!open || !mounted) return;
-    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const focusTimer = window.setTimeout(() => {
       cardRef.current?.querySelector<HTMLElement>("[data-tour-primary]")?.focus();
     }, 40);
+    return () => window.clearTimeout(focusTimer);
+  }, [mounted, open]);
+
+  React.useEffect(() => {
+    if (open || !mounted) return;
+    const previous = returnFocusRef.current;
+    returnFocusRef.current = null;
+    if (previous?.isConnected) previous.focus({ preventScroll: true });
+  }, [mounted, open]);
+
+  React.useEffect(() => {
+    if (!open || !mounted) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
@@ -182,11 +195,7 @@ export function Tour({
       }
     };
     window.addEventListener("keydown", onKey);
-    return () => {
-      window.clearTimeout(focusTimer);
-      window.removeEventListener("keydown", onKey);
-      if (previous?.isConnected) previous.focus({ preventScroll: true });
-    };
+    return () => window.removeEventListener("keydown", onKey);
   }, [mounted, open, next, back, skip, index]);
 
   if (!mounted || !open || !step || count === 0) return null;
