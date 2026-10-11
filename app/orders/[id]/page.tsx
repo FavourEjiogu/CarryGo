@@ -26,7 +26,7 @@ export default function Order(){const{id}=useParams<{id:string}>();const router=
  },[id]);
  useEffect(()=>{
   let cancelled=false;let timer=0;
-  const schedule=()=>{if(cancelled)return;window.clearTimeout(timer);timer=window.setTimeout(async()=>{if(!document.hidden)await load();schedule()},document.hidden?45000:8000)};
+  const schedule=()=>{if(cancelled)return;window.clearTimeout(timer);timer=window.setTimeout(async()=>{if(!document.hidden)await load(true);schedule()},document.hidden?45000:8000)};
   const visibility=()=>{if(document.visibilityState==='visible'){window.clearTimeout(timer);void load().finally(schedule)}};
   void load().finally(schedule);
   document.addEventListener('visibilitychange',visibility);
@@ -102,11 +102,53 @@ export default function Order(){const{id}=useParams<{id:string}>();const router=
  async function advance(s:string){if(busy)return;setBusy(true);try{const r=await fetch('/api/tasks/'+id+'/status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({next_status:s})}),j=await r.json().catch(()=>({}));if(!r.ok){setError(j.error||'Could not update status.');return}await load()}catch{setError('Status update failed. Check your connection and retry.')}finally{setBusy(false)}}
  async function accept(bid:string){if(busy)return;setBusy(true);try{const r=await fetch('/api/tasks/'+id+'/accept',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({bid_id:bid})}),j=await r.json().catch(()=>({}));if(!r.ok){setError(j.error||'Could not accept offer.');return}if(typeof j.redirect==='string')router.push(j.redirect);else{setError('The accepted offer was saved, but CarryGo could not open the next screen. Refresh task status.');await load()}}catch{setError('Could not accept the offer. Check your connection and retry.')}finally{setBusy(false)}}
  async function requestAdjustment(){if(busy)return;const numericCost=Number(newCost);const amount=Math.round(numericCost*100);if(!Number.isFinite(numericCost)||numericCost<=0||!Number.isSafeInteger(amount)){setError('Enter a valid item total greater than ₦0.');return}if(!reason.trim()||reason.trim().length>300){setError('Add a reason of no more than 300 characters.');return}if(receipt&&(!['image/jpeg','image/png','image/webp'].includes(receipt.type)||receipt.size>3*1024*1024)){setError('Receipt must be a JPEG, PNG or WebP image under 3 MB.');return}setBusy(true);try{const form=new FormData();form.set('new_item_cost_kobo',String(amount));form.set('reason',reason.trim());if(receipt)form.set('receipt',receipt);const r=await fetch('/api/tasks/'+id+'/price-adjustment',{method:'POST',body:form}),j=await r.json().catch(()=>({}));if(!r.ok){setError(j.error||'Could not request adjustment.');return}setNewCost('');setReason('');setReceipt(null);await load()}catch{setError('Price approval could not be requested. Check your connection and retry.')}finally{setBusy(false)}}
- async function decision(action:string,adjustmentId:string){const r=await fetch('/api/tasks/'+id+'/price-adjustment',{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({action,adjustment_id:adjustmentId})}),j=await r.json();if(!r.ok){setError(j.error||'Could not update adjustment.');return}load()}
- async function rotate(){const r=await fetch('/api/tasks/'+id+'/handoff',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'rotate'})}),j=await r.json();if(!r.ok){setError(j.error||'Could not create a handoff code.');return}setHandoffPin(j.pin)}
- async function verify(){if(busy||pin.length!==6)return;setBusy(true);try{const r=await fetch('/api/tasks/'+id+'/handoff',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'verify',pin})}),j=await r.json().catch(()=>({}));if(!r.ok){setError(j.error||'Could not verify handoff.');return}setPin('');await load()}catch{setError('Handoff verification failed. Check your connection and retry.')}finally{setBusy(false)}}
- async function retryVariance(adjustmentId:string){const r=await fetch('/api/tasks/'+id+'/price-adjustment/fund',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({adjustment_id:adjustmentId})}),j=await r.json();if(!r.ok){setError(j.error||'Could not fund variance.');return}load()}
+ async function decision(action:string,adjustmentId:string){
+  if(busy||!['approve','reject'].includes(action))return;
+  setBusy(true);
+  try{
+   const r=await fetch('/api/tasks/'+id+'/price-adjustment',{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({action,adjustment_id:adjustmentId})});
+   const j=await r.json().catch(()=>({}));
+   if(!r.ok){setError(j.error||'Could not update adjustment.');return}
+   await load(true);
+  }catch{setError('Could not update the price decision. Check your connection and retry.')}
+  finally{setBusy(false)}
+ }
+ async function rotate(){
+  if(busy)return;
+  setBusy(true);
+  try{
+   const r=await fetch('/api/tasks/'+id+'/handoff',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'rotate'})});
+   const j=await r.json().catch(()=>({}));
+   if(!r.ok){setError(j.error||'Could not create a handoff code.');return}
+   if(typeof j.pin==='string'&&/^\\d{6}$/.test(j.pin))setHandoffPin(j.pin);
+   else{setError('CarryGo did not return a valid handoff code. Refresh the task and try again.');await load(true)}
+  }catch{setError('Could not create a handoff code. Check your connection and retry.')}
+  finally{setBusy(false)}
+ }
+ async function verify(){if(busy||pin.length!==6)return;setBusy(true);try{const r=await fetch('/api/tasks/'+id+'/handoff',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'verify',pin})}),j=await r.json().catch(()=>({}));if(!r.ok){setError(j.error||'Could not verify handoff.');return}setPin('');await load(true)}catch{setError('Handoff verification failed. Check your connection and retry.')}finally{setBusy(false)}}
+ async function retryVariance(adjustmentId:string){
+  if(busy)return;
+  setBusy(true);
+  try{
+   const r=await fetch('/api/tasks/'+id+'/price-adjustment/fund',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({adjustment_id:adjustmentId})});
+   const j=await r.json().catch(()=>({}));
+   if(!r.ok){setError(j.error||'Could not fund variance.');return}
+   await load(true);
+  }catch{setError('Could not fund the approved difference. Check your connection and retry.')}
+  finally{setBusy(false)}
+ }
  async function repeat(){if(busy)return;setBusy(true);try{const r=await fetch('/api/tasks/'+id+'/repeat',{method:'POST'}),j=await r.json().catch(()=>({}));if(!r.ok){setError(j.error||'Could not repeat this task.');return}if(j.task?.id)router.push('/orders/'+j.task.id);else setError('CarryGo could not open the repeated task. Refresh Orders.')}catch{setError('Could not repeat this task. Check your connection and retry.')}finally{setBusy(false)}}
+ async function cancelTask(){
+  if(busy||!window.confirm('Cancel this task?'))return;
+  setBusy(true);
+  try{
+   const r=await fetch('/api/tasks/'+id+'/cancel',{method:'POST'});
+   const j=await r.json().catch(()=>({}));
+   if(!r.ok){setError(j.error||'Could not cancel.');return}
+   await load(true);
+  }catch{setError('Could not cancel this task. Check your connection and retry.')}
+  finally{setBusy(false)}
+ }
  async function ensureShareUrl():Promise<string|null>{
   if(shareUrl)return shareUrl;
   setShareBusy(true);
@@ -155,7 +197,7 @@ async function downloadStatusCard(){
   {t.status==='PRICE_ADJUSTMENT_PENDING'&&latest&&<section className="section-tight"><div className="card form"><div className="section-label"><span>PRICE CHANGE</span><span>{naira(latest.variance_kobo)} more</span></div><h2>Customer approval needed.</h2><p className="sub">Runner says the item now costs {naira(latest.new_item_cost_kobo)} instead of {naira(latest.previous_item_cost_kobo)}.</p><p className="soft-note">{latest.reason}</p>{latest.evidence_url&&<a className="text-link" href={latest.evidence_url} target="_blank" rel="noreferrer">View receipt →</a>}{payer&&<div className="actions"><button type="button" className="btn dark" disabled={busy} onClick={()=>decision('approve',latest.id)}>Approve + fund →</button><button type="button" className="btn ghost" disabled={busy} onClick={()=>decision('reject',latest.id)}>Decline</button></div>}</div></section>}
   {latest?.status==='APPROVED'&&payer&&<section className="section-tight"><div className="card form"><div className="section-label"><span>TOP-UP REQUIRED</span><span>{naira(latest.variance_kobo)}</span></div><p className="sub">The approval is recorded. Fund only the difference from your wallet.</p><button type="button" className="btn dark" disabled={busy} onClick={()=>retryVariance(latest.id)}>Fund difference →</button></div></section>}
   {t.status==='HANDOFF_PENDING'&&<section className="section-tight"><div className="card form"><div className="section-label"><span>HANDOFF</span><span>PIN verified on completion</span></div>{payer&&<>{handoffPin?<div className="pin-display"><small>YOUR CURRENT CODE</small><strong>{handoffPin}</strong></div>:<button type="button" className="btn dark" disabled={busy} onClick={rotate}>Show a new handoff code</button>}<div className="soft-note">Give the code to the runner only when the delivery is in your hands.</div></>}{runner&&<><label>Enter customer handoff code<input className="pin-box" inputMode="numeric" maxLength={6} value={pin} onChange={e=>setPin(e.target.value.replace(/\D/g,'').slice(0,6))} placeholder="6 digits"/></label><button type="button" className="btn lime" disabled={busy||pin.length!==6} onClick={verify}>Verify and complete →</button></>}</div></section>}
-  {['OPEN','NEGOTIATING','AGREED','FUNDING','FUNDED'].includes(t.status)&&<button type="button" className="btn ghost" disabled={busy} onClick={async()=>{if(!window.confirm('Cancel this task?'))return;setBusy(true);const r=await fetch('/api/tasks/'+id+'/cancel',{method:'POST'});const j=await r.json();setBusy(false);if(!r.ok){setError(j.error||'Could not cancel.');return}load()}}>Cancel task</button>}
+  {['OPEN','NEGOTIATING','AGREED','FUNDING','FUNDED'].includes(t.status)&&<button type="button" className="btn ghost" disabled={busy} onClick={cancelTask}>{busy?'Updating…':'Cancel task'}</button>}
   <section className="section-tight"><div className="section-label"><span>CHAT</span><span>Location questions belong here</span></div><div className="card chat"><div className="chat-list" aria-live="polite">{messages.map(m=>{const reply=()=>{setReplyTo(m);try{navigator.vibrate?.(8)}catch{}};return <div key={m.id} className={m.sender_id===viewer?'bubble me swipeable-message':'bubble swipeable-message'} onPointerDown={e=>{const el=e.currentTarget as HTMLElement;el.dataset.swipeX=String(e.clientX);el.style.transition='none';try{el.setPointerCapture(e.pointerId)}catch{}}} onPointerMove={e=>{const el=e.currentTarget as HTMLElement;const start=Number(el.dataset.swipeX||e.clientX);const dx=Math.max(0,Math.min(84,e.clientX-start));if(el.dataset.swipeX)el.style.transform=dx>0?'translateX('+dx+'px)':'';el.classList.toggle('swiping',dx>0)}} onPointerUp={e=>{const el=e.currentTarget as HTMLElement;const start=Number(el.dataset.swipeX||e.clientX);const dx=e.clientX-start;el.style.transition='';el.style.transform='';el.classList.remove('swiping');delete el.dataset.swipeX;if(dx>52)reply()}} onPointerCancel={e=>{const el=e.currentTarget as HTMLElement;el.style.transition='';el.style.transform='';el.classList.remove('swiping');delete el.dataset.swipeX}}><button type="button" className="message-reply-trigger" aria-label={"Reply to "+(m.sender_id===viewer?'your':'their')+" message"} onClick={reply}>↩</button>{m.reply_to&&<div className="reply-quote"><b>{m.reply_to.sender_id===viewer?'You':'Reply'}</b><span>{m.reply_to.body}</span></div>}<span>{m.body}</span><small>{new Date(m.created_at).toLocaleTimeString()}</small></div>})}</div>{peerTyping&&<div className="typing-cue" role="status" aria-live="polite"><i/><i/><i/><span>They’re replying…</span></div>}{replyTo&&<div className="reply-preview" aria-live="polite"><div><small>REPLYING TO</small><b>{replyTo.sender_id===viewer?'You':replyTo.body?.slice(0,80)}</b></div><button type="button" onClick={()=>setReplyTo(null)} aria-label="Cancel reply">×</button></div>}<div className="chat-compose"><input aria-label={replyTo?'Reply to message':'Message'} maxLength={1000} value={body} onChange={e=>setBody(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();void msg()}}} placeholder={replyTo?'Write a reply…':'Confirm the exact pickup point…'}/><button type="button" className="btn dark" disabled={messageBusy||!body.trim()} onClick={()=>void msg()}>{messageBusy?'Sending…':replyTo?'Reply':'Send'}</button><small className="message-counter" aria-live="off">{body.length}/1000</small></div></div></section>
  </main></AppShell>
 }
