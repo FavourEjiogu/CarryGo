@@ -33,6 +33,7 @@ export function PWAExperience() {
     };
 
     const onUpdate = () => setShowUpdate(true);
+    const onWorkerMessage = (event: MessageEvent) => { if (event.data?.type === 'CARRYGO_SW_UPDATED') setShowUpdate(true); };
 
     const standalone = window.matchMedia('(display-mode: standalone)').matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -49,12 +50,14 @@ export function PWAExperience() {
 
     window.addEventListener('beforeinstallprompt', onInstall as EventListener);
     window.addEventListener('carrygo:sw-update', onUpdate as EventListener);
+    navigator.serviceWorker?.addEventListener('message', onWorkerMessage);
 
     return () => {
       window.removeEventListener('online', refreshNetwork);
       window.removeEventListener('offline', refreshNetwork);
       window.removeEventListener('beforeinstallprompt', onInstall as EventListener);
       window.removeEventListener('carrygo:sw-update', onUpdate as EventListener);
+      navigator.serviceWorker?.removeEventListener('message', onWorkerMessage);
     };
   }, []);
 
@@ -83,7 +86,7 @@ export function PWAExperience() {
       <AnimatePresence>
         {!online && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} className="offline-toast" role="status">
-            You’re offline · saved screens still work
+            You’re offline · reconnect to continue
           </motion.div>
         )}
         {showInstall && installEvent && (
