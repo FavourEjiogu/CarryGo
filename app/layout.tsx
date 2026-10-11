@@ -1,4 +1,5 @@
 import type {Metadata,Viewport} from 'next';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import './globals.css';
 import './polish.css';
 import './launch-polish.css';
