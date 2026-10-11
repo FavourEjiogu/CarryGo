@@ -86,3 +86,6 @@ h1 em,h2 em,h3 em,h4 em,h5 em,h6 em,.app-title em,.home-landing-copy h1 em,.home
   .delivery-map-note{max-width:calc(100% - 28px);font-size:9px}
   .delivery-map-marker-label{max-width:130px}
 }
+
+.home-process .section-label button.text-link{border:0;background:transparent;padding:0;color:var(--purple);font:inherit;font-weight:850;text-align:right;text-underline-offset:4px}
+.home-process .section-label button.text-link:focus-visible{outline:2px solid var(--purple);outline-offset:4px;border-radius:4px}
