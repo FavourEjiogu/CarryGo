@@ -110,6 +110,7 @@ export function DeliveryRouteMap({
   React.useEffect(() => {
     let disposed = false;
     let map: MapLibreMap | null = null;
+    const markers = markersRef.current;
 
     async function initialize() {
       if (!canvasRef.current) return;
@@ -162,8 +163,8 @@ export function DeliveryRouteMap({
 
     return () => {
       disposed = true;
-      markersRef.current.forEach((marker) => marker.remove());
-      markersRef.current.clear();
+      markers.forEach((marker) => marker.remove());
+      markers.clear();
       map?.remove();
       mapRef.current = null;
     };
