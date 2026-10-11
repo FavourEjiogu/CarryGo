@@ -37,6 +37,13 @@ const TOUR_STEPS: TourStep[] = [
     placement: 'center',
   },
   {
+    target: '[data-tour-nav="home"]',
+    title: 'Home is your starting point',
+    content:
+      'Come back here for your campus context, open requests, current task and a quick reminder of your next move.',
+    placement: 'bottom',
+  },
+  {
     target: '#tour-do',
     title: 'Need something done?',
     content:
@@ -56,6 +63,27 @@ const TOUR_STEPS: TourStep[] = [
     content:
       'Post the request, agree on the runner and price, then follow the delivery through to handoff. Changes that affect cost need approval; the handoff code is used to confirm completion.',
     placement: 'top',
+  },
+  {
+    target: '[data-tour-nav="orders"]',
+    title: 'Orders is your control room',
+    content:
+      'Open a task to compare offers, message the other participant, follow delivery status and location when shared, approve price changes, and confirm handoff with the code.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour-nav="notifications"]',
+    title: 'Keep up without checking constantly',
+    content:
+      'The inbox surfaces important task changes and account updates so you can return when you need to act.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour-nav="you"]',
+    title: 'Your account and tools',
+    content:
+      'Use You for your account overview, wallet and earnings, profile details, security controls, rewards, and other personal settings.',
+    placement: 'bottom',
   },
 ];
 
