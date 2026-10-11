@@ -120,9 +120,7 @@ export async function downloadCarryGoStatusCard(input: CarryGoShareCardInput): P
   context.fillText("CarryGo", 108, 75);
   context.fillStyle = muted;
   context.font = "800 12px ui-sans-serif, system-ui, sans-serif";
-  context.letterSpacing = "2px";
   context.fillText("CAMPUS EXECUTION NETWORK", 268, 73);
-  context.letterSpacing = "0px";
 
   context.fillStyle = surface;
   roundedRect(context, 58, 112, 1084, 378, 26);
@@ -133,9 +131,7 @@ export async function downloadCarryGoStatusCard(input: CarryGoShareCardInput): P
 
   context.fillStyle = purple;
   context.font = "900 13px ui-sans-serif, system-ui, sans-serif";
-  context.letterSpacing = "2px";
   context.fillText("SHAREABLE DELIVERY UPDATE", 94, 154);
-  context.letterSpacing = "0px";
 
   const label = cleanText(input.status.replace(/_/g, " "), 50).toUpperCase() || "STATUS UPDATE";
   context.font = "900 13px ui-sans-serif, system-ui, sans-serif";
@@ -152,10 +148,8 @@ export async function downloadCarryGoStatusCard(input: CarryGoShareCardInput): P
 
   context.fillStyle = muted;
   context.font = "800 11px ui-sans-serif, system-ui, sans-serif";
-  context.letterSpacing = "1.4px";
   context.fillText("PICKUP", 94, 340);
   context.fillText("DROP-OFF", 626, 340);
-  context.letterSpacing = "0px";
 
   context.fillStyle = ink;
   context.font = "700 20px ui-sans-serif, system-ui, sans-serif";
