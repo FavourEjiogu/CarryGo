@@ -31,11 +31,16 @@ CarryGo is a **campus execution network for Nigeria**. The interface must never 
 Green and purple are accents, not body-copy colours. Primary actions stay black.
 
 ## Typography
-- Use the project's bold grotesk direction consistently.
-- Display text is heavy, tight and very large.
+- The current implementation uses a system sans-serif stack, not a bundled custom font: `ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`.
+- `--font-display`, `--font-body` and `--font-ui` currently resolve to that same stack in `app/launch-polish.css`. Do not describe the live implementation as Manrope, Space Grotesk or another custom family unless the code is changed and verified.
+- Display text is heavy, tight and very large through weight, size and letter spacing rather than a separate font file.
 - UI labels are compact, uppercase and strongly weighted.
 - Body copy is readable; muted copy is reserved for secondary information.
 - Numbers are heavy and tight for prices, streaks and ETAs.
+
+## Icons
+- The shared `Icon` component in `src/components/icons.tsx` uses small, hand-authored inline SVG path definitions.
+- Feature-specific screens also use `lucide-react` and `@tabler/icons-react`. Prefer the shared icon component for existing app navigation/actions; use one established library consistently for new feature-specific icons rather than mixing styles arbitrarily.
 
 ## Shape and depth
 - Large containers: 20–30px radius.

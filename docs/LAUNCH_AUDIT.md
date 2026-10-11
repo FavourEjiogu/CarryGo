@@ -1,0 +1,54 @@
+# CarryGo implementation verification audit
+
+**Last reviewed:** 2026-10-11  
+**Repository:** `FavourEjiogu/CarryGo`  
+**Reviewed main commit:** `79bba630b0dbdf00e8356c8bba2b5e2fcb633244`
+
+This document distinguishes code that exists from behavior that has been proven in the hosted production environment. A green build or a Vercel `READY` state is not an end-to-end production smoke test.
+
+## Verified in the repository
+
+| Concern | Finding | Status |
+|---|---|---|
+| Mobile hero's black visual panel | It was still rendered below the home CTA at mobile widths. This change hides it at widths below 800px. | Fixed in this change; visual device check still recommended |
+| Mouse-following eyes | The UI was hidden by a late global CSS rule even on desktop, while the component still attached a global mouse listener on touch devices. This change restores desktop visibility, hides the entire black hero visual on mobile, and only attaches the mouse listener when `(hover: hover) and (pointer: fine)` matches. | Fixed in this change; verify in a browser |
+| Purple heading emphasis | The shared CSS styles emphasized heading text with `--purple: #8B67FF`. | Implemented |
+| Brand colours | Ink `#0B0D0C`, paper `#F3F3ED`, surface `#FFFEF9`, line `#D9D9D0`, green `#B9FF35`, purple `#8B67FF`. | Implemented |
+| Typeface | Current code uses a system sans-serif stack; it does not bundle a named custom font. | Documented accurately |
+| Icons | Shared icons are hand-authored inline SVGs; feature pages also use Lucide and Tabler icons. | Implemented, with more than one source |
+| Rotating green CTA/card edge | `.energy-border` uses a conic-gradient and `energySpin`; the home primary CTA uses it. | Implemented on selected elements, not every CTA |
+| Optional password | Sign-in supports password mode; Security and reset-password pages support password creation/update and strength validation. OTP remains available. | Implemented in code |
+| Message reply | The task page has swipe-to-reply, a reply preview/quote, and the API stores `reply_to_message_id`. The live Supabase schema has that column. | Implemented in code/schema |
+| Typing indicator | The task page polls participant presence and displays “They’re replying…”; the API restricts access to task participants and expires stale presence after six seconds. | Implemented in code/schema |
+| Mobile low-network marketing copy | The home page does not mention 2G/3G/4G or advertise internal low-network implementation details. | Verified in home source |
+| Campus neutrality | The home source does not hard-code Bingham/Karu; `docs/design.md` specifies campus selection during onboarding. | Verified in source/docs |
+| PWA privacy | The service worker does not cache navigations, API responses, or arbitrary GET/RSC payloads. It caches the offline fallback and selected same-origin static assets. | Implemented in code |
+| SEO and error recovery | App Router error UI, robots metadata and sitemap metadata exist. | Implemented in code |
+| Runner task filters | All / Room eligible / Lower capital update the displayed task list. | Implemented in code |
+| Analytics consent | PostHog initialization and event capture are gated on stored opt-in; Privacy allows changing the choice. | Implemented in code; hosted events not proven |
+
+## Not yet proven / still needs an external check
+
+1. **Supabase OTP email template — BLOCKING.** The app's OTP code path is present, but the hosted email template is a Supabase dashboard setting. Ensure the production Magic Link email template contains both `{{ .ConfirmationURL }}` and `{{ .Token }}`. Then request a real production OTP email and verify the six-digit code. Until that test passes, do not claim the OTP issue is fully resolved.
+2. **Supabase redirect allowlist.** Vercel production has `NEXT_PUBLIC_SITE_URL=https://carrygo-chi.vercel.app`, and the code has the same canonical fallback. The hosted Supabase Site URL and redirect allowlist still need confirmation in the Supabase dashboard.
+3. **Production auth smoke test.** Test sign-up, OTP sign-in, magic-link sign-in, callback, password reset/update and MFA against the production domain using a test account.
+4. **PostHog delivery.** Vercel has production PostHog environment-variable entries, but consent gating, token validity and actual production events have not been confirmed with a live event.
+5. **Production HTTP/browser checks.** The latest Vercel deployment for the reviewed main commit is reported `READY` with `carrygo-chi.vercel.app` assigned. The connected Vercel URL/runtime tools denied access during this review, so homepage, login, robots/sitemap, install and runtime logs were not independently smoke-tested here.
+6. **PWA device checks.** The manifest currently uses one SVG icon with `any maskable` purpose. Verify installation icons and the install/update/offline flow on current Android and iOS devices.
+7. **Reproducible installs.** The repository currently has no npm lockfile, and CI runs `npm install`, not `npm ci`. Generate and commit a real lockfile from a clean install before treating dependency resolution as fully reproducible.
+8. **Data/schema change discipline.** Do not apply the deferred academic RLS migration from an old audit branch without comparing it to the current production policies/schema first.
+
+## Production dependency failure
+
+The reported `ETARGET` came from stale commit `c83e9ded...` on `fix/final-launch-polish`, which requested `@radix-ui/react-slider@1.3.7`. Current main declares the published `1.4.7`, and the production deployment was created from the merged main commit above.
+
+## Release rule
+
+Close a concern only when there is evidence at the right layer:
+- source change for code behavior;
+- passing CI for build/type/lint/test behavior;
+- database inspection for schema claims;
+- dashboard inspection for hosted settings;
+- real browser/email/device smoke test for user-visible production behavior.
+
+Do not use “deployed” as a synonym for “end-to-end verified.”

@@ -90,6 +90,9 @@ export function MouseFollowingEyes({
   }, []);
 
   useEffect(() => {
+    // Do not install a global pointer listener on touch-first devices. CSS
+    // hides the eyes there too, but this keeps the interaction truly desktop-only.
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     let frame = 0;
     let scheduled = false;
     let next = { x: 0, y: 0 };
@@ -104,8 +107,20 @@ export function MouseFollowingEyes({
       });
     };
 
-    window.addEventListener("mousemove", onMouseMove, { passive: true });
+    const syncPointerListener = () => {
+      window.cancelAnimationFrame(frame);
+      scheduled = false;
+      if (finePointer.matches) {
+        window.addEventListener("mousemove", onMouseMove, { passive: true });
+      } else {
+        window.removeEventListener("mousemove", onMouseMove);
+      }
+    };
+
+    syncPointerListener();
+    finePointer.addEventListener("change", syncPointerListener);
     return () => {
+      finePointer.removeEventListener("change", syncPointerListener);
       window.removeEventListener("mousemove", onMouseMove);
       window.cancelAnimationFrame(frame);
     };
