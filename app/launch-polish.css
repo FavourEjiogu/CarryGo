@@ -116,3 +116,52 @@ h1 em,h2 em,h3 em,h4 em,h5 em,h6 em,.app-title em,.home-landing-copy h1 em,.home
 @keyframes campus-pin-pulse{0%,100%{box-shadow:0 0 0 2px var(--ink),0 0 0 4px rgba(185,255,53,.08)}50%{box-shadow:0 0 0 2px var(--ink),0 0 0 7px rgba(185,255,53,.26)}}
 @media(max-width:620px){.campus-network-map.card{height:420px;margin-top:18px;border-radius:19px}.campus-network-map-badge{left:10px;top:10px}.campus-network-map-note{left:10px;bottom:10px;max-width:calc(100% - 20px);font-size:9px}}
 @media(prefers-reduced-motion:reduce){.campus-location-pin{animation:none}}
+
+
+/* Delivery experience: animated human runner, map controls, and precise labels. */
+.delivery-route-map{position:relative;isolation:isolate;overflow:hidden;border-radius:20px;background:#e7ece3;min-width:0}
+.delivery-map-canvas{isolation:isolate}
+.delivery-map-controls{position:absolute;z-index:7;top:12px;right:12px;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px;max-width:calc(100% - 24px)}
+.delivery-map-control{min-height:44px;max-width:100%;border:1px solid rgba(11,13,12,.18);border-radius:12px;padding:9px 12px;background:rgba(255,254,249,.97);color:var(--ink);font-size:10px;font-weight:900;box-shadow:0 5px 16px rgba(11,13,12,.12);cursor:pointer}
+.delivery-map-control:disabled{opacity:.45;cursor:not-allowed}
+.delivery-map-control:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
+.delivery-map-legend{position:absolute;z-index:6;top:60px;left:12px;display:flex;flex-wrap:wrap;gap:7px;padding:7px 9px;border:1px solid rgba(11,13,12,.1);border-radius:11px;background:rgba(255,254,249,.95);box-shadow:0 5px 16px rgba(11,13,12,.09);pointer-events:none}
+.delivery-map-legend span{display:inline-flex;align-items:center;gap:5px;color:var(--ink);font-size:9px;font-weight:850;white-space:nowrap}
+.delivery-map-legend i{display:inline-block;width:8px;height:8px;border:1px solid var(--ink);border-radius:50%;background:var(--green)}
+.delivery-map-legend .legend-dropoff{background:var(--purple)}
+.delivery-map-legend .legend-runner{background:var(--ink);box-shadow:inset 0 0 0 2px var(--green)}
+.delivery-map-badge{max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.delivery-map-note{z-index:6;padding-right:8px;max-width:min(580px,calc(100% - 24px));bottom:12px;left:12px}
+.delivery-map-marker.runner,.delivery-map-marker.illustrative{align-items:center;gap:4px;filter:drop-shadow(0 4px 10px rgba(11,13,12,.26));pointer-events:none}
+.delivery-runner-avatar{position:relative;z-index:1;display:grid;place-items:center;width:42px;height:42px;border:2px solid #fff;border-radius:15px;background:var(--ink);box-shadow:0 0 0 3px rgba(185,255,53,.9),0 8px 22px rgba(11,13,12,.24)}
+.delivery-runner-avatar svg{overflow:visible}
+.runner-figure-head{fill:var(--green);stroke:var(--green);stroke-width:1.5}
+.runner-figure-torso,.runner-figure-arm-front,.runner-figure-arm-back,.runner-figure-leg-front,.runner-figure-leg-back{fill:none;stroke:var(--green);stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round;transform-box:fill-box}
+.runner-figure-arm-front,.runner-figure-arm-back{transform-origin:12px 8px;animation:carrygo-runner-arms .48s ease-in-out infinite alternate}
+.runner-figure-arm-back{animation-delay:-.24s}
+.runner-figure-leg-front,.runner-figure-leg-back{transform-origin:11px 16px;animation:carrygo-runner-legs .48s ease-in-out infinite alternate}
+.runner-figure-leg-back{animation-delay:-.24s}
+.delivery-runner-trail{position:absolute;left:-9px;bottom:7px;width:13px;height:2px;border-radius:2px;background:var(--green);opacity:.72;box-shadow:-5px -5px 0 -0.2px var(--green);animation:carrygo-runner-trail .7s ease-in-out infinite alternate}
+.delivery-map-marker.illustrative .delivery-runner-avatar{box-shadow:0 0 0 3px rgba(139,103,255,.8),0 8px 22px rgba(11,13,12,.24)}
+.delivery-map-marker.illustrative .delivery-runner-trail{background:var(--purple);box-shadow:-5px -5px 0 -0.2px var(--purple)}
+.delivery-map-marker-label{max-width:200px;text-align:center}
+.delivery-route-map[data-motion-paused="true"] .runner-figure-arm-front,
+.delivery-route-map[data-motion-paused="true"] .runner-figure-arm-back,
+.delivery-route-map[data-motion-paused="true"] .runner-figure-leg-front,
+.delivery-route-map[data-motion-paused="true"] .runner-figure-leg-back,
+.delivery-route-map[data-motion-paused="true"] .delivery-runner-trail{animation-play-state:paused!important}
+@keyframes carrygo-runner-arms{from{transform:rotate(-18deg)}to{transform:rotate(24deg)}}
+@keyframes carrygo-runner-legs{from{transform:rotate(-25deg)}to{transform:rotate(28deg)}}
+@keyframes carrygo-runner-trail{from{transform:translateX(1px);opacity:.25}to{transform:translateX(-4px);opacity:.85}}
+@media(max-width:620px){
+  .delivery-map-controls{top:54px;right:10px;gap:5px}
+  .delivery-map-control{min-height:42px;padding:8px 9px;font-size:9px}
+  .delivery-map-legend{top:108px;left:10px;gap:6px;padding:6px 8px}
+  .delivery-map-legend span{font-size:8px}
+  .delivery-runner-avatar{width:38px;height:38px;border-radius:13px}
+  .delivery-map-note{left:10px;bottom:10px;max-width:calc(100% - 20px);font-size:9px}
+  .delivery-map-marker-label{max-width:140px;font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  .runner-figure-arm-front,.runner-figure-arm-back,.runner-figure-leg-front,.runner-figure-leg-back,.delivery-runner-trail{animation:none!important}
+}
