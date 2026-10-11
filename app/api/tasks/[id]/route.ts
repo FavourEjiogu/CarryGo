@@ -22,8 +22,10 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
   const itemsPromise=participant?s.from('errand_items').select('id,name,quantity,estimated_unit_cost_kobo,max_unit_cost_kobo,notes').eq('errand_id',id).order('created_at',{ascending:true}).limit(20):Promise.resolve({data:[]});
   const adjustmentsPromise=participant?s.from('price_adjustments').select('id,errand_id,requested_by,previous_item_cost_kobo,new_item_cost_kobo,variance_kobo,reason,evidence_object_path,status,approved_by,approved_at,created_at').eq('errand_id',id).order('created_at',{ascending:false}).limit(5):Promise.resolve({data:[]});
   const locationPromise=participant&&['IN_PROGRESS','AT_VENDOR','PRICE_ADJUSTMENT_PENDING','ITEM_CONFIRMED','EN_ROUTE','HANDOFF_PENDING'].includes(task.status)?s.from('delivery_sessions').select('id,errand_id,status,started_at,ended_at,last_runner_lat,last_runner_lng,last_runner_accuracy_m,last_runner_at,last_payer_lat,last_payer_lng,last_payer_accuracy_m,last_payer_at,tracking_mode').eq('errand_id',id).maybeSingle():Promise.resolve({data:null});
+  const routeLocationIds=[task.pickup_location_id,task.destination_location_id].filter((value):value is string=>Boolean(value));
+  const routePointsPromise=participant&&routeLocationIds.length?s.from('campus_locations').select('id,name,latitude,longitude').eq('campus_id',task.campus_id).in('id',routeLocationIds):Promise.resolve({data:[],error:null});
   const handoffPromise=participant?s.rpc('get_handoff',{p_errand_id:id}):Promise.resolve({data:{handoff:null}});
-  const [runner,bids,agreement,messages,items,adjustments,location,handoff]=await Promise.all([runnerPromise,bidsPromise,agreementPromise,messagesPromise,itemsPromise,adjustmentsPromise,locationPromise,handoffPromise]);
+  const [runner,bids,agreement,messages,items,adjustments,location,routePoints,handoff]=await Promise.all([runnerPromise,bidsPromise,agreementPromise,messagesPromise,itemsPromise,adjustmentsPromise,locationPromise,routePointsPromise,handoffPromise]);
 
   let bidRows:any[]=bids.data||[];
   if(bidRows.length){
@@ -53,6 +55,7 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
     bids:bidRows,
     messages:messages.data||[],
     adjustments:adjustmentRows,
+    route_points:(routePoints.data||[]).map(point=>({id:point.id,name:point.name,latitude:point.latitude,longitude:point.longitude})),
     tracking:{session:location.data||null},
     handoff:handoff.data?.handoff||null,
     viewer_id:user.id

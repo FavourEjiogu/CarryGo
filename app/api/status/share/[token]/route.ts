@@ -10,5 +10,5 @@ export async function GET(_request:Request,{params}:{params:Promise<{token:strin
  const{data,error}=await s.rpc('get_shared_task_status',{p_token_hash:hash});
  const task=Array.isArray(data)?data[0]:null;
  if(error||!task)return NextResponse.json({error:'This status link has expired or is unavailable.'},{status:410,headers:{'Cache-Control':'no-store'}});
- return NextResponse.json({task,expires_at:task.expires_at},{headers:{'Cache-Control':'no-store'}});
+ return NextResponse.json({task:{status:task.status,updated_at:task.updated_at,expires_at:task.expires_at},expires_at:task.expires_at},{headers:{'Cache-Control':'no-store'}});
 }

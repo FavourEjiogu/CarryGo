@@ -72,3 +72,22 @@ Close a concern only when there is evidence at the right layer:
 - real browser/email/device smoke test for user-visible production behavior.
 
 Do not use “deployed” as a synonym for “end-to-end verified.”
+
+
+## Follow-on work: guided onboarding, maps, sharing and Brevo
+
+This section tracks the current feature branch; do not interpret it as production-verified until CI, deployment, and live-flow checks pass.
+
+| Area | Change | Remaining evidence |
+|---|---|---|
+| Product tour | Home first-run tour is now actually rendered, explains requesting a task, earning as a runner, and the Post → Agree → Move lifecycle; includes replay and skip/finish persistence. The previous home page created tour state but did not render the tour component. | Verify first-run, replay, mobile layout, keyboard and reduced-motion behavior in a browser. |
+| Delivery map | Replaces the CSS-only route illustration with MapLibre GL JS and OpenFreeMap's keyless vector style; shows only real saved coordinates or recently shared GPS, and labels the dashed route as an approximation rather than navigation. | MapLibre tile loading, markers, attribution and location-sharing behavior still need a browser test. |
+| Coordinate data | Current live query returned 45 Bingham campus-location rows and 0 with latitude/longitude. | Populate/verify place coordinates before expecting pickup and drop-off markers; do not invent them. |
+| Branded share image | Task participants can generate a PNG status card bearing CarryGo branding and the short-lived status URL. Public status page has a visible CarryGo link and omits exact route labels and free-text task title. | Verify image download and public status link expiry in a browser. Normal OS screenshots are not automatically rewritten by a web app. |
+| Brevo SMTP | Added `docs/BREVO_SETUP.md` with the intended Brevo-to-Supabase Auth configuration and test plan. No SMTP credentials were added to source. | Domain SPF/DKIM, Supabase custom SMTP, OTP template and real delivery must be configured/tested in provider dashboards. |
+| Map/sharing handoff | Added `docs/MAP_AND_SHARING.md`. | Routing directions, ETA calculations and coordinate seeding are explicitly outside this lightweight map integration. |
+
+
+## Shared status privacy change (PR #16)
+
+The public status API now whitelists only status, update time, and expiry. Migration `20261011150000_reduce_shared_status_payload.sql` narrows the Supabase RPC response so token holders cannot fetch a task title or exact route text from that RPC. **The migration is included in this PR but has not been applied to production yet. Apply it after merge; until then, the live RPC still has its previous wider response.**
