@@ -44,7 +44,48 @@ export default function Order(){const{id}=useParams<{id:string}>();const router=
   const timer=window.setTimeout(()=>{fetch('/api/tasks/'+id+'/presence',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({is_typing:active})}).catch(()=>{})},active?350:250);
   return()=>window.clearTimeout(timer);
  },[body,id]);
- useEffect(()=>{if(!trackOn||!locationSharingAllowed||!navigator.geolocation)return;let seq=Number(localStorage.getItem('cg:seq:'+id)||0);const send=(p:GeolocationPosition)=>{seq+=1;localStorage.setItem('cg:seq:'+id,String(seq));const x={taskId:id,latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy_m:p.coords.accuracy,captured_at:new Date().toISOString(),sequence:seq};const post=()=>fetch('/api/tasks/'+id+'/location',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(x)}).then(r=>{if(r.status>=500||r.status===429)throw new Error('Location service temporarily unavailable');removeQueued(id,x.sequence)}).catch(()=>queueLocation(x));if(navigator.onLine)post();else queueLocation(x)};const watch=navigator.geolocation.watchPosition(send,()=>setError('Location permission was not granted. Chat and handoff verification still work.'),{enableHighAccuracy:false,maximumAge:30000,timeout:15000});const retry=setInterval(()=>{if(!navigator.onLine)return;for(const x of readLocationQueue().filter(q=>q.taskId===id)){fetch('/api/tasks/'+id+'/location',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(x)}).then(r=>{if(r.status<500)removeQueued(id,x.sequence)}).catch(()=>{})}},60000);return()=>{navigator.geolocation.clearWatch(watch);clearInterval(retry)}},[id,trackOn,locationSharingAllowed]);
+ useEffect(()=>{
+  if(!trackOn||!locationSharingAllowed)return;
+  if(!navigator.geolocation){setError('This device does not provide location services. You can still follow delivery status and use handoff verification.');setTrackOn(false);return}
+  let active=true;let seq=0;
+  try{const stored=Number(localStorage.getItem('cg:seq:'+id)||0);seq=Number.isSafeInteger(stored)&&stored>0?stored:0}catch{}
+  const enqueue=(payload:{taskId:string;latitude:number;longitude:number;accuracy_m:number;captured_at:string;sequence:number})=>{
+   try{queueLocation(payload)}catch{setError('This browser could not save a pending location update. Keep CarryGo open while online.')}
+  };
+  const deliver=async(payload:{taskId:string;latitude:number;longitude:number;accuracy_m:number;captured_at:string;sequence:number})=>{
+   try{
+    const response=await fetch('/api/tasks/'+id+'/location',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+    const result=await response.json().catch(()=>({}));
+    if(response.status>=500||response.status===429)throw new Error('temporary');
+    if(response.status===401||response.status===403){setError(result.error||'Location sharing is no longer authorized for this task.');return}
+    if(response.ok||response.status<500)removeQueued(id,payload.sequence);
+   }catch{enqueue(payload)}
+  };
+  const send=(position:GeolocationPosition)=>{
+   if(!active)return;
+   seq+=1;
+   try{localStorage.setItem('cg:seq:'+id,String(seq))}catch{}
+   const capturedAt=Number.isFinite(position.timestamp)?new Date(position.timestamp).toISOString():new Date().toISOString();
+   const payload={taskId:id,latitude:position.coords.latitude,longitude:position.coords.longitude,accuracy_m:position.coords.accuracy,captured_at:capturedAt,sequence:seq};
+   if(navigator.onLine)void deliver(payload);else enqueue(payload);
+  };
+  const locationError=(cause:GeolocationPositionError)=>{
+   if(!active)return;
+   if(cause.code===cause.PERMISSION_DENIED){setError('Location permission was denied. Live GPS is off; chat and handoff verification still work.');setTrackOn(false)}
+   else if(cause.code===cause.POSITION_UNAVAILABLE)setError('Your device could not determine a location. Check GPS settings; delivery status and chat still work.');
+   else setError('Location lookup timed out. Keep sharing enabled and CarryGo will try again.');
+  };
+  const watch=navigator.geolocation.watchPosition(send,locationError,{enableHighAccuracy:false,maximumAge:30000,timeout:15000});
+  const retry=window.setInterval(()=>{
+   if(!active||!navigator.onLine)return;
+   let queued:{taskId:string;latitude:number;longitude:number;accuracy_m:number;captured_at:string;sequence:number}[]=[];
+   try{queued=readLocationQueue().filter(item=>item.taskId===id)}catch{setError('Could not read pending location updates from this browser.');return}
+   for(const payload of queued)void deliver(payload);
+  },60000);
+  const onOnline=()=>{if(navigator.onLine){try{for(const payload of readLocationQueue().filter(item=>item.taskId===id))void deliver(payload)}catch{}}};
+  window.addEventListener('online',onOnline);
+  return()=>{active=false;navigator.geolocation.clearWatch(watch);window.clearInterval(retry);window.removeEventListener('online',onOnline)};
+ },[id,trackOn,locationSharingAllowed]);
  async function msg(){const x=body.trim();if(!x)return;const r=await fetch('/api/tasks/'+id+'/messages',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({body:x,reply_to_message_id:replyTo?.id||null})}),j=await r.json();if(!r.ok){setError(j.error||'Message failed.');return}setBody('');setReplyTo(null);setMessages(v=>[...v,{...j.message,reply_to:replyTo?{id:replyTo.id,sender_id:replyTo.sender_id,body:replyTo.body}:null}]);fetch('/api/tasks/'+id+'/presence',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({is_typing:false})}).catch(()=>{})}
  async function advance(s:string){setBusy(true);const r=await fetch('/api/tasks/'+id+'/status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({next_status:s})}),j=await r.json();setBusy(false);if(!r.ok){setError(j.error||'Could not update status.');return}load()}
  async function accept(bid:string){const r=await fetch('/api/tasks/'+id+'/accept',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({bid_id:bid})}),j=await r.json();if(!r.ok){setError(j.error||'Could not accept offer.');return}router.push(j.redirect)}
