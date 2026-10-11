@@ -1,5 +1,7 @@
 # CarryGo Supabase Auth configuration
 
+> **Verification status (2026-10-11):** The repository implements the OTP UI and calls Supabase `verifyOtp({ email, token, type: 'email' })`. The repository cannot prove or change the hosted project's email-template settings. Do **not** mark OTP production-ready until the deployed app has been used to request a real code, the email visibly contains `{{ .Token }}`, and the code successfully signs in. A magic-link-only template will continue to make the OTP UI misleading.
+
 CarryGo supports two passwordless email methods:
 - Magic link: the user taps the secure link and returns to `/auth/callback`.
 - Email OTP: the user enters the six-digit `{{ .Token }}` code directly in CarryGo.

@@ -313,7 +313,12 @@ h1 em,h2 em,h3 em{font-style:normal;color:var(--purple)}
 @media(max-width:620px){.faq-security{grid-template-columns:1fr}.faq-icon{grid-row:auto}.faq-security .sub,.faq-security .actions{grid-column:auto}.profile-identity{grid-template-columns:auto 1fr}.profile-identity>.btn{grid-column:1/-1;width:100%}}
 
 /* Touch-safe message replies and desktop-only cursor interaction */
-.desktop-eyes-only{display:none!important;pointer-events:none}
+.desktop-eyes-only{display:flex!important;pointer-events:none}
+/* Keep the black visual/eyes on desktop only; mobile gets a direct, compact hero. */
+@media(max-width:799px){
+  .desktop-eyes-only{display:none!important}
+  .home-landing-visual{display:none!important}
+}
 .swipeable-message{touch-action:pan-y;will-change:transform;transition:transform .16s var(--ease),background .16s ease}
 .swipeable-message.swiping{user-select:none;cursor:grabbing}
 .message-reply-trigger{opacity:0;transform:translateY(2px);transition:opacity .15s ease,transform .15s var(--ease)}
