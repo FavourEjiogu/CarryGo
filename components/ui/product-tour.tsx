@@ -62,7 +62,10 @@ export function Tour({
   const isLast = index === count - 1;
   const pad = step?.padding ?? 8;
 
-  React.useEffect(() => setMounted(true), []);
+  React.useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setMounted(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   const setIndex = React.useCallback((nextIndex: number) => {
     const next = Math.min(Math.max(0, nextIndex), Math.max(0, steps.length - 1));
