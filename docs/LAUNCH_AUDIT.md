@@ -76,21 +76,21 @@ Do not use “deployed” as a synonym for “end-to-end verified.”
 
 ## Follow-on work: guided onboarding, maps, sharing and Brevo
 
-This section tracks the current feature branch; do not interpret it as production-verified until CI, deployment, and live-flow checks pass.
+Status updated after PRs #16–#19: source is merged and CI passes. The last confirmed READY Vercel deployment still points at an older commit, and live browser verification of the new features remains pending.
 
 | Area | Change | Remaining evidence |
 |---|---|---|
 | Product tour | Home first-run tour is now actually rendered, explains requesting a task, earning as a runner, and the Post → Agree → Move lifecycle; includes replay and skip/finish persistence. The previous home page created tour state but did not render the tour component. | Verify first-run, replay, mobile layout, keyboard and reduced-motion behavior in a browser. |
 | Delivery map | Replaces the CSS-only route illustration with MapLibre GL JS and OpenFreeMap's keyless vector style; shows only real saved coordinates or recently shared GPS, and labels the dashed route as an approximation rather than navigation. | MapLibre tile loading, markers, attribution and location-sharing behavior still need a browser test. |
-| Coordinate data | Current live query returned 45 Bingham campus-location rows and 0 with latitude/longitude. | Populate/verify place coordinates before expecting pickup and drop-off markers; do not invent them. |
+| Coordinate data | Current live query returns 48 public/active Bingham campus-location rows, of which 8 have latitude/longitude. The 8 georeferenced rows are Omega, Girls New Hostel 1–3, Chief Seth Oshatoba Hostel, Portfolio Hostel, Newest Boys Hostel and Newest Girls Hostel. | Remaining 40 places have no coordinates and therefore cannot yet be pinned on the map. The provided coordinates put Girls New Hostel 3 and Portfolio within a few metres of each other; confirm whether these are separate physical spots. |
 | Branded share image | Task participants can generate a PNG status card bearing CarryGo branding and the short-lived status URL. Public status page has a visible CarryGo link and omits exact route labels and free-text task title. | Verify image download and public status link expiry in a browser. Normal OS screenshots are not automatically rewritten by a web app. |
 | Brevo SMTP | Added `docs/BREVO_SETUP.md` with the intended Brevo-to-Supabase Auth configuration and test plan. No SMTP credentials were added to source. | Domain SPF/DKIM, Supabase custom SMTP, OTP template and real delivery must be configured/tested in provider dashboards. |
 | Map/sharing handoff | Added `docs/MAP_AND_SHARING.md`. | Routing directions, ETA calculations and coordinate seeding are explicitly outside this lightweight map integration. |
 
 
-## Shared status privacy change (PR #16)
+## Shared status privacy change (PRs #17–#18)
 
-The public status API now whitelists only status, update time, and expiry. Migration `20261011150000_reduce_shared_status_payload.sql` narrows the Supabase RPC response so token holders cannot fetch a task title or exact route text from that RPC. **The migration is included in this PR but has not been applied to production yet. Apply it after merge; until then, the live RPC still has its previous wider response.**
+The public status API whitelists only status, update time, and expiry. Migration `supabase/migrations/20261011195524_reduce_shared_status_payload.sql` was applied to the connected Supabase project (migration version `20261011195524`) and the repository migration filename was aligned with the recorded version. The public wrapper uses a fixed empty search path, calls the private token-hash implementation, and revokes direct execution on that private implementation from `PUBLIC`, `anon`, and `authenticated`.
 
 
 ## Campus coordinates, route map, and motion polish — 2026-10-11
@@ -99,8 +99,13 @@ The public status API now whitelists only status, update time, and expiry. Migra
 |---|---|---|
 | Bingham location coordinates | Seeded the user-supplied coordinates for Omega, Chief Seth Hostel, Portfolio, Newest Boys/Girls hostels, and three Girls New Hostels. | Live database query confirmed all eight names have coordinates; three Girls New Hostel rows were created, five existing rows updated. |
 | Task route map | Default map view now opens around Bingham campus. Pickup/drop-off points come from `campus_locations`; the route stroke has a restrained pulse. | The map component and DB data are updated. The map still draws a straight-line estimate, not a road route or ETA. |
-| Block wordmark | Added a Remotion block-deck wordmark for the CarryGo header. It lazy-loads, plays once per session, then uses a static fallback. | Repository code added; a successful hosted build and browser visual test are still required. |
-| Purple emphasis | Purple emphasis now receives a left-to-right translucent highlighter sweep under the text. Reduced-motion preferences disable the sweep. | CSS added; visual check in production remains pending. |
+| Block wordmark | Added a Remotion block-deck wordmark for the CarryGo header. It lazy-loads, plays once per session, then uses a static fallback. | CI passed typecheck, lint, tests and production build on the merged PR head. Production/browser visual test remains pending. |
+| Purple emphasis | Purple emphasis now receives a left-to-right translucent highlighter sweep under the text. Reduced-motion preferences disable the sweep. | CSS is merged and CI passes; visual check in production remains pending. |
 | Supplied `mg-food-delivery-route` snippet | The supplied excerpt contains gallery metadata (`defFor`) and a demo importing an implementation file that was not included. It is not a standalone delivery-route React component, so the app continues using the existing production MapLibre component instead of copying unresolved imports. | Route map adapted in-place; no unrelated gallery-only Remotion composition was added. |
 
 The two supplied labels **Girls New Hostel 3** and **Portfolio** are less than a few metres apart based on the coordinates provided. Both are retained as separate named places, but confirm those positions if they should represent distinct physical entrances.
+
+
+## Deployment gate after PR #19
+
+PR #19 was squash-merged as `3f6f908d45f953360bdd2347e4783424a5bd6563`. GitHub Actions CI run #151 passed (typecheck, lint, tests, production build). However, Vercel's connected tools returned HTTP 403 for the `mellothetrader-6573s-projects` scope when listing/creating deployments. The last confirmed READY production alias `carrygo-chi.vercel.app` serves deployment `dpl_8LP5u6hThkTGAqHYxEZSqNZHFZMM` at the older commit `b95c46dcf0cc886d1e72fd4f22157655c210f824`. Reauthorize the Vercel integration for that exact scope, deploy the merged main commit, then test `/campus`, the purple heading animation, wordmark animation, map tile loading and pickup/drop-off markers in a browser before calling this release production-verified.
