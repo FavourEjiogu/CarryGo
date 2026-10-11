@@ -26,6 +26,33 @@ export type LiveCoordinate = {
   updatedAt?: string | null;
 };
 
+type DeliveryRouteMapProps = {
+  pickupText: string;
+  destinationText: string;
+  pickupPoint?: RouteCoordinate | null;
+  destinationPoint?: RouteCoordinate | null;
+  runnerLocation?: LiveCoordinate | null;
+  payerLocation?: LiveCoordinate | null;
+  deliveryStatus?: string;
+  runnerLabel?: string;
+  payerLabel?: string;
+  className?: string;
+};
+
+function subscribeReducedMotion(onChange: () => void) {
+  const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function getReducedMotionServerSnapshot() {
+  return true;
+}
+
 function createRunnerFigure(): SVGSVGElement {
   const ns = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(ns, "svg");
@@ -353,9 +380,10 @@ export function DeliveryRouteMap({
     marker.setLngLat([pickup.longitude, pickup.latitude]).addTo(map);
 
     const duration = 18_000;
+    const startedAt = performance.now();
     const frame = (now: number) => {
       if (disposed || !marker) return;
-      const progress = (now % duration) / duration;
+      const progress = ((now - startedAt) % duration) / duration;
       const fadeIn = Math.min(1, progress / 0.045);
       const fadeOut = Math.min(1, (1 - progress) / 0.075);
       const opacity = Math.max(0, Math.min(fadeIn, fadeOut));
@@ -469,18 +497,20 @@ export function DeliveryRouteMap({
           className="delivery-map-control"
           onClick={() => setMotionPaused((paused) => !paused)}
           aria-pressed={animationsPaused}
-          aria-label={animationsPaused ? "Resume decorative map animation" : "Pause decorative map animation"}
+          aria-label={prefersReducedMotion ? "Map animation disabled by your device setting" : animationsPaused ? "Resume decorative map animation" : "Pause decorative map animation"}
           title={prefersReducedMotion ? "Your device prefers reduced motion" : undefined}
+          disabled={prefersReducedMotion}
         >
-          {animationsPaused ? "Play map motion" : "Pause motion"}
+          {prefersReducedMotion ? "Reduced motion" : animationsPaused ? "Play map motion" : "Pause motion"}
         </button>
       </div>
-      <div className="delivery-map-legend" aria-label="Map legend">
+      <div className="delivery-map-legend" role="group" aria-label="Map legend">
         <span><i className="legend-pickup" />Pickup</span>
         <span><i className="legend-dropoff" />Drop-off</span>
         <span><i className="legend-runner" />Runner</span>
+        {payer && <span><i className="legend-shared" />Shared location</span>}
       </div>
-      <div className="delivery-map-note" aria-live="polite">{routeDescription}</div>
+      <div className="delivery-map-note" aria-live="off">{routeDescription}</div>
       {!mapReady && !mapError && <div className="delivery-map-loading" role="status">Loading map…</div>}
     </section>
   );
