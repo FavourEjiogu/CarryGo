@@ -26,7 +26,7 @@ export default function Order(){const{id}=useParams<{id:string}>();const router=
  },[id]);
  useEffect(()=>{
   let cancelled=false;let timer=0;
-  const schedule=()=>{if(cancelled)return;timer=window.setTimeout(async()=>{if(!document.hidden)await load();schedule()},document.hidden?45000:8000)};
+  const schedule=()=>{if(cancelled)return;window.clearTimeout(timer);timer=window.setTimeout(async()=>{if(!document.hidden)await load();schedule()},document.hidden?45000:8000)};
   const visibility=()=>{if(document.visibilityState==='visible'){window.clearTimeout(timer);void load().finally(schedule)}};
   void load().finally(schedule);
   document.addEventListener('visibilitychange',visibility);
@@ -71,8 +71,8 @@ export default function Order(){const{id}=useParams<{id:string}>();const router=
   };
   const locationError=(cause:GeolocationPositionError)=>{
    if(!active)return;
-   if(cause.code===cause.PERMISSION_DENIED){setError('Location permission was denied. Live GPS is off; chat and handoff verification still work.');setTrackOn(false)}
-   else if(cause.code===cause.POSITION_UNAVAILABLE)setError('Your device could not determine a location. Check GPS settings; delivery status and chat still work.');
+   if(cause.code===1){setError('Location permission was denied. Live GPS is off; chat and handoff verification still work.');setTrackOn(false)}
+   else if(cause.code===2)setError('Your device could not determine a location. Check GPS settings; delivery status and chat still work.');
    else setError('Location lookup timed out. Keep sharing enabled and CarryGo will try again.');
   };
   const watch=navigator.geolocation.watchPosition(send,locationError,{enableHighAccuracy:false,maximumAge:30000,timeout:15000});
