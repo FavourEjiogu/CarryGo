@@ -6,6 +6,12 @@ import type {
   Map as MapLibreMap,
   Marker as MapLibreMarker,
 } from "maplibre-gl";
+import {
+  formatLocationAge,
+  isLocationFresh,
+  normalizeCoordinate,
+  type Coordinate,
+} from "@/src/lib/delivery-tracking";
 
 export type RouteCoordinate = {
   id?: string;
@@ -19,84 +25,6 @@ export type LiveCoordinate = {
   longitude?: string | number | null;
   updatedAt?: string | null;
 };
-
-type Coordinate = { latitude: number; longitude: number };
-
-type DeliveryRouteMapProps = {
-  pickupText: string;
-  destinationText: string;
-  pickupPoint?: RouteCoordinate | null;
-  destinationPoint?: RouteCoordinate | null;
-  runnerLocation?: LiveCoordinate | null;
-  payerLocation?: LiveCoordinate | null;
-  deliveryStatus?: string;
-  runnerLabel?: string;
-  payerLabel?: string;
-  className?: string;
-};
-
-const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-
-function subscribeReducedMotion(onChange: () => void) {
-  const media = window.matchMedia(REDUCED_MOTION_QUERY);
-  media.addEventListener("change", onChange);
-  return () => media.removeEventListener("change", onChange);
-}
-
-function getReducedMotionSnapshot() {
-  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
-}
-
-function getReducedMotionServerSnapshot() {
-  return true;
-}
-
-function validCoordinate(
-  value: RouteCoordinate | LiveCoordinate | null | undefined,
-): Coordinate | null {
-  if (
-    !value ||
-    value.latitude === null ||
-    value.latitude === undefined ||
-    value.latitude === "" ||
-    value.longitude === null ||
-    value.longitude === undefined ||
-    value.longitude === ""
-  ) return null;
-
-  const latitude = Number(value.latitude);
-  const longitude = Number(value.longitude);
-  if (
-    !Number.isFinite(latitude) ||
-    !Number.isFinite(longitude) ||
-    latitude < -90 ||
-    latitude > 90 ||
-    longitude < -180 ||
-    longitude > 180
-  ) return null;
-
-  return { latitude, longitude };
-}
-
-function isFresh(updatedAt?: string | null): boolean {
-  if (!updatedAt) return false;
-  const timestamp = Date.parse(updatedAt);
-  if (!Number.isFinite(timestamp)) return false;
-  const age = Date.now() - timestamp;
-  return age >= -30_000 && age <= 3 * 60 * 1000;
-}
-
-function relativeAge(updatedAt?: string | null): string | null {
-  if (!updatedAt) return null;
-  const timestamp = Date.parse(updatedAt);
-  if (!Number.isFinite(timestamp)) return null;
-  const seconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
-  if (seconds < 10) return "just now";
-  if (seconds < 60) return seconds + "s ago";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return minutes + "m ago";
-  return Math.floor(minutes / 60) + "h ago";
-}
 
 function createRunnerFigure(): SVGSVGElement {
   const ns = "http://www.w3.org/2000/svg";
@@ -181,6 +109,8 @@ export function DeliveryRouteMap({
   const maplibreRef = React.useRef<typeof import("maplibre-gl") | null>(null);
   const markersRef = React.useRef<Map<string, MapLibreMarker>>(new Map());
   const animatedRunnerRef = React.useRef<MapLibreMarker | null>(null);
+  const lastFittedRouteKeyRef = React.useRef<string | null>(null);
+  const didInitialPointFitRef = React.useRef(false);
   const [mapReady, setMapReady] = React.useState(false);
   const [mapError, setMapError] = React.useState("");
   const [motionPaused, setMotionPaused] = React.useState(false);
@@ -191,13 +121,13 @@ export function DeliveryRouteMap({
   );
   const animationsPaused = motionPaused || prefersReducedMotion;
 
-  const pickup = validCoordinate(pickupPoint);
-  const destination = validCoordinate(destinationPoint);
-  const runnerCandidate = validCoordinate(runnerLocation);
-  const payerCandidate = validCoordinate(payerLocation);
-  const runner = runnerCandidate && isFresh(runnerLocation?.updatedAt) ? runnerCandidate : null;
-  const payer = payerCandidate && isFresh(payerLocation?.updatedAt) ? payerCandidate : null;
-  const runnerAge = relativeAge(runnerLocation?.updatedAt);
+  const pickup = normalizeCoordinate(pickupPoint);
+  const destination = normalizeCoordinate(destinationPoint);
+  const runnerCandidate = normalizeCoordinate(runnerLocation);
+  const payerCandidate = normalizeCoordinate(payerLocation);
+  const runner = runnerCandidate && isLocationFresh(runnerLocation?.updatedAt) ? runnerCandidate : null;
+  const payer = payerCandidate && isLocationFresh(payerLocation?.updatedAt) ? payerCandidate : null;
+  const runnerAge = formatLocationAge(runnerLocation?.updatedAt);
   const locationIsStale = Boolean(runnerCandidate && !runner);
 
   const coordinatesKey = [
@@ -357,11 +287,18 @@ export function DeliveryRouteMap({
     const allPoints = entries
       .filter((entry) => entry.point)
       .map((entry) => entry.point as Coordinate);
-    if (allPoints.length >= 2) {
-      const west = Math.min(...allPoints.map((point) => point.longitude));
-      const east = Math.max(...allPoints.map((point) => point.longitude));
-      const south = Math.min(...allPoints.map((point) => point.latitude));
-      const north = Math.max(...allPoints.map((point) => point.latitude));
+    // GPS updates must move markers, not yank the camera away from the user's
+    // chosen view every polling cycle. Auto-fit only when the route becomes known
+    // or its pickup/drop-off coordinates genuinely change.
+    const routeKey = pickup && destination
+      ? [pickup.latitude, pickup.longitude, destination.latitude, destination.longitude].join(":")
+      : null;
+    if (routeKey && routeKey !== lastFittedRouteKeyRef.current) {
+      lastFittedRouteKeyRef.current = routeKey;
+      const west = Math.min(pickup.longitude, destination.longitude);
+      const east = Math.max(pickup.longitude, destination.longitude);
+      const south = Math.min(pickup.latitude, destination.latitude);
+      const north = Math.max(pickup.latitude, destination.latitude);
       if (west === east && south === north) {
         map.easeTo({ center: [west, south], zoom: 15, duration: 450 });
       } else {
@@ -371,12 +308,11 @@ export function DeliveryRouteMap({
           duration: 450,
         });
       }
-    } else if (allPoints.length === 1) {
-      map.easeTo({
-        center: [allPoints[0].longitude, allPoints[0].latitude],
-        zoom: 15,
-        duration: 450,
-      });
+      didInitialPointFitRef.current = true;
+    } else if (!didInitialPointFitRef.current && allPoints.length > 0) {
+      didInitialPointFitRef.current = true;
+      const first = allPoints[0];
+      map.easeTo({ center: [first.longitude, first.latitude], zoom: 15, duration: 450 });
     }
   // coordinatesKey is the meaningful map input signature, not object identity.
   // eslint-disable-next-line react-hooks/exhaustive-deps
