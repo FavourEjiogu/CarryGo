@@ -59,3 +59,30 @@ h1 em,h2 em,h3 em,h4 em,h5 em,h6 em,.app-title em,.home-landing-copy h1 em,.home
 @media(prefers-reduced-motion:reduce){
   .loading-orbit i{animation:none}
 }
+
+
+/* Real map surface. Attribution stays visible in MapLibre's built-in control. */
+.delivery-route-map{isolation:isolate;min-width:0;min-height:360px;background:#e7ece3;overflow:hidden}
+.delivery-map-canvas{position:absolute;inset:0;width:100%;height:100%;min-height:360px}
+.delivery-map-canvas .maplibregl-map{font:inherit}
+.delivery-map-badge{position:absolute;z-index:5;left:14px;top:14px;display:inline-flex;align-items:center;gap:7px;max-width:calc(100% - 28px);padding:8px 11px;border:1px solid rgba(11,13,12,.12);border-radius:999px;background:rgba(255,254,249,.94);color:var(--ink);font-size:9px;font-weight:950;letter-spacing:.08em;box-shadow:0 6px 22px rgba(11,13,12,.1);pointer-events:none}
+.delivery-map-live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(185,255,53,.25);flex:0 0 auto}
+.delivery-map-note{position:absolute;z-index:5;left:14px;bottom:14px;max-width:min(390px,calc(100% - 28px));padding:9px 11px;border:1px solid rgba(11,13,12,.1);border-radius:12px;background:rgba(255,254,249,.94);color:#454941;font-size:10px;line-height:1.45;box-shadow:0 6px 22px rgba(11,13,12,.09);pointer-events:none}
+.delivery-map-loading{position:absolute;z-index:4;inset:0;display:grid;place-items:center;background:rgba(243,243,237,.72);font-size:12px;font-weight:850;color:var(--ink);pointer-events:none}
+.delivery-map-marker{display:flex;align-items:center;flex-direction:column;gap:4px;white-space:nowrap;transform:translateY(1px);filter:drop-shadow(0 2px 6px rgba(11,13,12,.22));pointer-events:none}
+.delivery-map-marker-dot{width:17px;height:17px;border-radius:50%;border:3px solid #fff;background:var(--green);box-shadow:0 0 0 2px var(--ink)}
+.delivery-map-marker.dropoff .delivery-map-marker-dot{background:var(--purple)}
+.delivery-map-marker.runner .delivery-map-marker-dot{width:19px;height:19px;background:var(--ink);box-shadow:0 0 0 3px var(--green);border:3px solid #fff}
+.delivery-map-marker.payer .delivery-map-marker-dot{background:#3478f6}
+.delivery-map-marker-label{max-width:180px;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(11,13,12,.12);border-radius:7px;padding:3px 6px;background:rgba(255,254,249,.96);color:var(--ink);font-size:9px;font-weight:900;box-shadow:0 2px 6px rgba(11,13,12,.1)}
+.track-grid .delivery-route-map{height:auto;min-height:460px}
+.track-grid .delivery-map-canvas{min-height:460px}
+.shared-status-brand{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.shared-status-brand a{font-weight:950;text-decoration:underline;text-decoration-color:var(--purple);text-underline-offset:4px}
+.shared-status-watermark{font-size:9px;letter-spacing:.11em;font-weight:950;color:var(--muted);text-transform:uppercase}
+@media(max-width:620px){
+  .track-grid .delivery-route-map{min-height:360px}
+  .track-grid .delivery-map-canvas{min-height:360px}
+  .delivery-map-note{max-width:calc(100% - 28px);font-size:9px}
+  .delivery-map-marker-label{max-width:130px}
+}
