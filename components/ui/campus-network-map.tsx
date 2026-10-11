@@ -43,6 +43,7 @@ function markerElement(point: Point): HTMLDivElement {
   const label = document.createElement("span");
   label.className = "campus-location-label";
   label.textContent = point.name;
+  root.title = point.name;
 
   root.append(pin, label);
   return root;
@@ -83,6 +84,9 @@ export function CampusNetworkMap({ locations }: { locations: CampusMapLocation[]
           cooperativeGestures: true,
         });
         mapRef.current = map;
+        map.on("zoomend", () => {
+          canvasRef.current?.classList.toggle("campus-show-labels", map?.getZoom() !== undefined && map.getZoom() >= 16);
+        });
         map.on("load", () => {
           if (!disposed) setMapReady(true);
         });
@@ -126,10 +130,14 @@ export function CampusNetworkMap({ locations }: { locations: CampusMapLocation[]
         existing.setLngLat([point.longitude, point.latitude]);
         continue;
       }
-      const marker = new maplibre.Marker({
-        element: markerElement(point),
-        anchor: "bottom",
-      })
+      const element = markerElement(point);
+      element.addEventListener("click", () => {
+        new maplibre.Popup({ closeButton: true, closeOnClick: true, maxWidth: "240px" })
+          .setLngLat([point.longitude, point.latitude])
+          .setText(point.name)
+          .addTo(map);
+      });
+      const marker = new maplibre.Marker({ element, anchor: "bottom" })
         .setLngLat([point.longitude, point.latitude])
         .addTo(map);
       markerRefs.current.set(point.id, marker);
@@ -165,7 +173,7 @@ export function CampusNetworkMap({ locations }: { locations: CampusMapLocation[]
       <div className="campus-network-map-note" aria-live="polite">
         {mapError || (
           points.length
-            ? points.length + " named place" + (points.length === 1 ? "" : "s") + " with coordinates. Select a marker to see its name; zoom and drag to explore."
+            ? points.length + " named place" + (points.length === 1 ? "" : "s") + " with coordinates. Tap a marker for its name; zoom in to reveal labels and drag to explore."
             : "Place pins will appear when verified coordinates are available."
         )}
       </div>
