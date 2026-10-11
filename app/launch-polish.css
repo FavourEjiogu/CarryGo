@@ -10,8 +10,9 @@ h1,h2,h3,h4,h5,h6,.brand,.app-title,.action-tile strong,.home-landing-copy h1,.h
   font-family:var(--font-display);
 }
 h1 em,h2 em,h3 em,h4 em,h5 em,h6 em,.app-title em,.home-landing-copy h1 em,.home-visual-copy em{
-  color:var(--purple)!important;font-style:normal;
+  color:var(--purple)!important;font-style:normal;display:inline;background-image:linear-gradient(rgba(139,103,255,.2),rgba(139,103,255,.2));background-repeat:no-repeat;background-position:left 88%;background-size:0 62%;box-decoration-break:clone;-webkit-box-decoration-break:clone;padding-inline:.035em;border-radius:.12em;animation:carrygo-purple-highlight .82s cubic-bezier(.16,1,.3,1) both;
 }
+@keyframes carrygo-purple-highlight{from{background-size:0 62%}to{background-size:100% 62%}}
 .auth-brand-copy h2 em{color:var(--purple)!important}
 .shell{padding-inline:max(0px,env(safe-area-inset-left))}
 .app-page{padding-top:clamp(24px,4vw,42px);padding-bottom:calc(100px + env(safe-area-inset-bottom))}
@@ -89,3 +90,29 @@ h1 em,h2 em,h3 em,h4 em,h5 em,h6 em,.app-title em,.home-landing-copy h1 em,.home
 
 .home-process .section-label button.text-link{border:0;background:transparent;padding:0;color:var(--purple);font:inherit;font-weight:850;text-align:right;text-underline-offset:4px}
 .home-process .section-label button.text-link:focus-visible{outline:2px solid var(--purple);outline-offset:4px;border-radius:4px}
+
+
+/* The Remotion wordmark is lazy-loaded and played once per browser session. */
+.brand-wordmark-static{display:inline-flex;align-items:center;font-size:19px;font-weight:950;letter-spacing:-.06em;line-height:1;white-space:nowrap}
+.brand-wordmark-motion{display:inline-flex;align-items:center;justify-content:flex-start;width:112px;height:28px;overflow:hidden;flex:0 0 112px}
+.brand-wordmark-motion .remotion-player{overflow:hidden!important}
+@media(prefers-reduced-motion:reduce){h1 em,h2 em,h3 em,h4 em,h5 em,h6 em,.app-title em,.home-landing-copy h1 em,.home-visual-copy em{animation:none;background-size:100% 62%}}
+
+
+/* Real, responsive campus map replacing the former static campus illustration. */
+.campus-network-map.card{position:relative;isolation:isolate;height:clamp(380px,52vw,570px);min-height:360px;margin-top:22px;padding:0;border:1px solid var(--line);border-radius:24px;background:#e7ece3;overflow:hidden}
+.campus-network-map-canvas{position:absolute;inset:0;width:100%;height:100%;min-height:360px}
+.campus-network-map-canvas .maplibregl-map{font:inherit}
+.campus-network-map-badge{position:absolute;z-index:5;left:14px;top:14px;display:inline-flex;align-items:center;gap:7px;max-width:calc(100% - 28px);padding:8px 11px;border:1px solid rgba(11,13,12,.12);border-radius:999px;background:rgba(255,254,249,.95);color:var(--ink);font-size:9px;font-weight:950;letter-spacing:.08em;box-shadow:0 6px 22px rgba(11,13,12,.1);pointer-events:none}
+.campus-network-map-live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(185,255,53,.25);flex:0 0 auto}
+.campus-network-map-note{position:absolute;z-index:5;left:14px;bottom:14px;max-width:min(430px,calc(100% - 28px));padding:9px 11px;border:1px solid rgba(11,13,12,.1);border-radius:12px;background:rgba(255,254,249,.95);color:#454941;font-size:10px;line-height:1.45;box-shadow:0 6px 22px rgba(11,13,12,.09);pointer-events:none}
+.campus-network-map-loading{position:absolute;z-index:4;inset:0;display:grid;place-items:center;background:rgba(243,243,237,.72);font-size:12px;font-weight:850;color:var(--ink);pointer-events:none}
+.campus-location-marker{display:flex;align-items:center;flex-direction:column;gap:4px;transform:translateY(1px);filter:drop-shadow(0 2px 6px rgba(11,13,12,.22));cursor:pointer;pointer-events:auto}
+.campus-location-pin{width:17px;height:17px;border-radius:50%;border:3px solid #fff;background:var(--green);box-shadow:0 0 0 2px var(--ink);animation:campus-pin-pulse 2.2s ease-in-out infinite}
+.campus-location-marker-merchant .campus-location-pin,.campus-location-marker-food .campus-location-pin,.campus-location-marker-shop .campus-location-pin{background:var(--purple)}
+.campus-location-label{display:none;max-width:165px;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(11,13,12,.12);border-radius:7px;padding:3px 6px;background:rgba(255,254,249,.97);color:var(--ink);font-size:9px;font-weight:900;box-shadow:0 2px 6px rgba(11,13,12,.1);white-space:nowrap}
+.campus-show-labels .campus-location-label{display:block}
+.map-note{font-size:10px;color:var(--muted);margin-top:9px}
+@keyframes campus-pin-pulse{0%,100%{box-shadow:0 0 0 2px var(--ink),0 0 0 4px rgba(185,255,53,.08)}50%{box-shadow:0 0 0 2px var(--ink),0 0 0 7px rgba(185,255,53,.26)}}
+@media(max-width:620px){.campus-network-map.card{height:420px;margin-top:18px;border-radius:19px}.campus-network-map-badge{left:10px;top:10px}.campus-network-map-note{left:10px;bottom:10px;max-width:calc(100% - 20px);font-size:9px}}
+@media(prefers-reduced-motion:reduce){.campus-location-pin{animation:none}}

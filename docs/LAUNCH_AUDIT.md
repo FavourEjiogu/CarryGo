@@ -1,4 +1,4 @@
-# CarryGo implementation verification audit
+| Campus directory map | Replaced the static decorative campus diagram with an interactive MapLibre/OpenFreeMap map. Coordinate-bearing places render as tappable markers with name popups; labels appear at closer zooms to avoid overlap. | Eight coordinate-bearing Bingham places verified in Supabase. Browser visual validation remains pending. |\n# CarryGo implementation verification audit
 
 **Last reviewed:** 2026-10-11  
 **Repository:** `FavourEjiogu/CarryGo`  
@@ -91,3 +91,16 @@ This section tracks the current feature branch; do not interpret it as productio
 ## Shared status privacy change (PR #16)
 
 The public status API now whitelists only status, update time, and expiry. Migration `20261011150000_reduce_shared_status_payload.sql` narrows the Supabase RPC response so token holders cannot fetch a task title or exact route text from that RPC. **The migration is included in this PR but has not been applied to production yet. Apply it after merge; until then, the live RPC still has its previous wider response.**
+
+
+## Campus coordinates, route map, and motion polish — 2026-10-11
+
+| Concern | Change | Verification |
+|---|---|---|
+| Bingham location coordinates | Seeded the user-supplied coordinates for Omega, Chief Seth Hostel, Portfolio, Newest Boys/Girls hostels, and three Girls New Hostels. | Live database query confirmed all eight names have coordinates; three Girls New Hostel rows were created, five existing rows updated. |
+| Task route map | Default map view now opens around Bingham campus. Pickup/drop-off points come from `campus_locations`; the route stroke has a restrained pulse. | The map component and DB data are updated. The map still draws a straight-line estimate, not a road route or ETA. |
+| Block wordmark | Added a Remotion block-deck wordmark for the CarryGo header. It lazy-loads, plays once per session, then uses a static fallback. | Repository code added; a successful hosted build and browser visual test are still required. |
+| Purple emphasis | Purple emphasis now receives a left-to-right translucent highlighter sweep under the text. Reduced-motion preferences disable the sweep. | CSS added; visual check in production remains pending. |
+| Supplied `mg-food-delivery-route` snippet | The supplied excerpt contains gallery metadata (`defFor`) and a demo importing an implementation file that was not included. It is not a standalone delivery-route React component, so the app continues using the existing production MapLibre component instead of copying unresolved imports. | Route map adapted in-place; no unrelated gallery-only Remotion composition was added. |
+
+The two supplied labels **Girls New Hostel 3** and **Portfolio** are less than a few metres apart based on the coordinates provided. Both are retained as separate named places, but confirm those positions if they should represent distinct physical entrances.

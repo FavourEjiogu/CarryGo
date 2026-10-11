@@ -110,6 +110,8 @@ export function DeliveryRouteMap({
   React.useEffect(() => {
     let disposed = false;
     let map: MapLibreMap | null = null;
+    let pulseTimer: number | null = null;
+    let pulseStep = false;
     const markers = markersRef.current;
 
     async function initialize() {
@@ -121,8 +123,8 @@ export function DeliveryRouteMap({
         map = new maplibre.Map({
           container: canvasRef.current,
           style: "https://tiles.openfreemap.org/styles/liberty",
-          center: [8, 8],
-          zoom: 5,
+          center: [7.704, 8.956],
+          zoom: 14,
           attributionControl: {},
           pitchWithRotate: false,
           dragRotate: false,
@@ -148,6 +150,16 @@ export function DeliveryRouteMap({
               "line-dasharray": [2, 1],
             },
           });
+          // Pulse the route stroke subtly so the map feels active without implying live movement.
+          const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          if (!reduceMotion) {
+            pulseTimer = window.setInterval(() => {
+              if (disposed || !map || !map.getLayer("carrygo-route-line")) return;
+              pulseStep = !pulseStep;
+              map.setPaintProperty("carrygo-route-line", "line-width", pulseStep ? 4.8 : 3.6);
+              map.setPaintProperty("carrygo-route-line", "line-opacity", pulseStep ? 0.98 : 0.74);
+            }, 850);
+          }
           setMapReady(true);
         });
 
@@ -163,6 +175,7 @@ export function DeliveryRouteMap({
 
     return () => {
       disposed = true;
+      if (pulseTimer !== null) window.clearInterval(pulseTimer);
       markers.forEach((marker) => marker.remove());
       markers.clear();
       map?.remove();
@@ -260,7 +273,7 @@ export function DeliveryRouteMap({
       </div>
       <div className="delivery-map-note" aria-live="polite">
         {mapError || (knownRoute
-          ? "Dashed line is a direct estimate, not turn-by-turn directions."
+          ? "Dashed line is a straight-line estimate, not a road route or ETA."
           : anyPosition
             ? "Showing available location signals. Add campus coordinates to enable pickup and drop-off pins."
             : "Map ready. Pickup and drop-off pins appear when campus coordinates are available or live sharing begins.")}
