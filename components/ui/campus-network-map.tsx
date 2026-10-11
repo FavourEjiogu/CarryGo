@@ -85,7 +85,9 @@ export function CampusNetworkMap({ locations }: { locations: CampusMapLocation[]
         });
         mapRef.current = map;
         map.on("zoomend", () => {
-          canvasRef.current?.classList.toggle("campus-show-labels", map?.getZoom() !== undefined && map.getZoom() >= 16);
+          const currentMap = map;
+          if (!currentMap) return;
+          canvasRef.current?.classList.toggle("campus-show-labels", currentMap.getZoom() >= 17);
         });
         map.on("load", () => {
           if (!disposed) setMapReady(true);
