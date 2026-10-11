@@ -151,7 +151,7 @@ export function DeliveryRouteMap({
         });
 
         map.on("error", (event) => {
-          if (event.error) setMapError("The map could not load right now. The delivery details remain available below.");
+          if (!disposed && event.error) setMapError("The map could not load right now. The delivery details remain available below.");
         });
       } catch {
         if (!disposed) setMapError("Interactive map is unavailable on this device. You can still follow delivery status below.");
@@ -162,7 +162,6 @@ export function DeliveryRouteMap({
 
     return () => {
       disposed = true;
-      setMapReady(false);
       markersRef.current.forEach((marker) => marker.remove());
       markersRef.current.clear();
       map?.remove();
@@ -193,13 +192,14 @@ export function DeliveryRouteMap({
         continue;
       }
       import("maplibre-gl").then((maplibre) => {
-        if (!mapRef.current || !mapReady || !entry.point || markersRef.current.has(entry.key)) return;
+        const targetMap = mapRef.current;
+        if (!targetMap || !mapReady || !entry.point || markersRef.current.has(entry.key)) return;
         const current = new maplibre.Marker({
           element: elementForMarker(entry.label, entry.className),
           anchor: "bottom",
         })
           .setLngLat([entry.point.longitude, entry.point.latitude])
-          .addTo(mapRef.current);
+          .addTo(targetMap);
         markersRef.current.set(entry.key, current);
       }).catch(() => setMapError("The map markers could not be loaded."));
     }
