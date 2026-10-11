@@ -454,12 +454,12 @@ export function DeliveryRouteMap({
 
   const routeDescription = mapError
     ? mapError
-    : animationIsIllustrative
-      ? "Human runner animation follows the straight-line estimate; it is illustrative, not live GPS. The dashed line is not road navigation or an ETA."
-      : runner
-        ? "Runner location updated " + (runnerAge || "recently") + ". The dashed line is a straight-line estimate, not road navigation or an ETA."
-        : locationIsStale
-          ? "Runner location is stale (last update " + (runnerAge || "unknown") + "). Turn on location sharing for fresh GPS. The dashed line is not road navigation or an ETA."
+    : locationIsStale
+      ? "Last runner GPS was " + (runnerAge || "a while ago") + ". " + (animationIsIllustrative ? "The moving human is an illustration, not a live position. " : "") + "Enable sharing for fresh GPS. The dashed line is not road navigation or an ETA."
+      : animationIsIllustrative
+        ? "Human runner animation follows the straight-line estimate; it is illustrative, not live GPS. The dashed line is not road navigation or an ETA."
+        : runner
+          ? "Runner location updated " + (runnerAge || "recently") + ". The dashed line is a straight-line estimate, not road navigation or an ETA."
           : knownRoute
             ? "Pickup and drop-off are mapped. Fresh runner GPS appears when location sharing is enabled. The dashed line is not road navigation or an ETA."
             : anyPosition
@@ -475,7 +475,6 @@ export function DeliveryRouteMap({
       <div
         ref={canvasRef}
         className="delivery-map-canvas"
-        role="region"
         aria-label={"Interactive map for delivery from " + pickupText + " to " + destinationText}
       />
       <div className="delivery-map-badge">
